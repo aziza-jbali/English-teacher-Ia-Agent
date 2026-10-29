@@ -5381,24 +5381,81 @@ def build_due_review_context(limit=2):
     return "\n".join(lines), due_mistakes
 
 
-def looks_like_separate_question(message):
-    """Avoid grading an obvious new question as an answer to the pending quiz."""
-    stripped = (message or "").strip().lower()
-    if "?" in stripped:
-        return True
-    return bool(re.match(
-        r"^(what|why|when|where|who|whom|whose|which|how|can|could|would|will|do|does|did|is|are|am|was|were|have|has|had)\b",
-        stripped,
-    ))
+# def looks_like_separate_question(message):
+#     """Avoid grading an obvious new question as an answer to the pending quiz."""
+#     stripped = (message or "").strip().lower()
+#     if "?" in stripped:
+#         return True
+#     return bool(re.match(
+#         r"^(what|why|when|where|who|whom|whose|which|how|can|could|would|will|do|does|did|is|are|am|was|were|have|has|had)\b",
+#         stripped,
+#     ))
 
+
+# def looks_like_separate_question(message):
+#     """Detect a new question without relying only on punctuation."""
+#     stripped = (message or "").strip().lower()
+
+#     if not stripped:
+#         return False
+
+#     question_starters = (
+#         r"^(what|why|when|where|who|whom|whose|which|how|"
+#         r"can|could|would|will|do|does|did|is|are|am|was|were|"
+#         r"have|has|had)\b"
+#     )
+
+#     return bool(re.match(question_starters, stripped))
+
+
+def looks_like_separate_question(message):
+    """Detect clear new questions without relying only on the first word."""
+    stripped = (message or "").strip().lower()
+
+    if not stripped:
+        return False
+
+    # Only treat clear, standalone requests as new questions.
+    question_patterns = (
+        r"^(what|why|when|where|who|whom|whose|which|how)"
+        r"\b.*\?\s*$",
+        r"^(can|could|would|will|do|does|did|is|are|am|was|were|"
+        r"have|has|had)\b.*\?\s*$",
+    )
+
+    return any(re.search(pattern, stripped) for pattern in question_patterns)
 
 # PHASE3_STEP5_EXPANDED_HELP_DETECTION
 # Added definition; the original help detector above remains unchanged.
+# def looks_like_review_help_request(message):
+#     """Recognize help requests rather than scoring them as review answers."""
+#     stripped = normalize(message)
+#     help_patterns = [
+#         r"\bremind me\b",
+#         r"\brepeat\b",
+#         r"\bsay that again\b",
+#         r"\bwhat was the sentence\b",
+#         r"\bwhat sentence (do|did|should|must|need to)\b",
+#         r"\bwhich sentence\b",
+#         r"\bgive me a hint\b",
+#         r"\bhelp me\b",
+#         r"\bexplain (it|that|the sentence|the question)\b",
+#         r"\bi (do not|don't|dont) remember\b",
+#         r"\bi (do not|don't|dont) understand\b",
+#         r"\bcan we skip\b",
+#         r"\bcan we do this later\b",
+#         r"\bwhat do i need to correct\b",
+#         r"\btell me (the )?(sentence|question)\b",
+#     ]
+#     return any(re.search(pattern, stripped) for pattern in help_patterns)
+
+
+
 def looks_like_review_help_request(message):
-    """Recognize help requests rather than scoring them as review answers."""
+    """Recognize clear requests for help with a pending review."""
     stripped = normalize(message)
+
     help_patterns = [
-        r"\bremind me\b",
         r"\brepeat\b",
         r"\bsay that again\b",
         r"\bwhat was the sentence\b",
@@ -5414,8 +5471,8 @@ def looks_like_review_help_request(message):
         r"\bwhat do i need to correct\b",
         r"\btell me (the )?(sentence|question)\b",
     ]
-    return any(re.search(pattern, stripped) for pattern in help_patterns)
 
+    return any(re.search(pattern, stripped) for pattern in help_patterns)
 
 # ============================================================
 # 7. REVIEW ANSWER EVALUATION
