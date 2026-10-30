@@ -1,4956 +1,3 @@
-# import os
-# from memory import save_mistake, get_mistakes
-# # from memory tells Python to look in memory.py.
-# # - import save_mistake, get_mistakes makes those two functions available in chatbot.py.
-# import json
-# # json is a Python module that helps us read and write JSON data.
-# response_text = '{"has_mistake": true, "original": "I am agree with you", "correction": "I agree with you"}'
-
-# data = json.loads(response_text)
-
-# from pyexpat.errors import messages #lahna hadhi tasla7 bach najem nsta3mel  7ajet mil operating system, 
-# # os is a Python built-in module that lets us interact with things from the operating system.
-# import ollama
-
-# # Here we're going to use it to read an environment variable
-# from dotenv import load_dotenv
-# from google import genai
-# # We installed python-dotenv.
-
-# # This gives us load_dotenv(), which reads the .env file. dotenv y3wna bach nakro les variables  w el contenu eli mawjoud fi .env
-# load_dotenv()
-# "Go look for the .env file and load its variables."
-# api_key = os.getenv("GEMINI_API_KEY")
-# # "Python, give me the value stored under GEMINI_API_KEY."
-# #
-# # print(api_key)
-# # if api_key:
-# #     # "Did we actually get a value?"
-# #     print("✅ Gemini API key loaded successfully!")
-# # else:
-# #     print("❌ Gemini API key not found!")
-# client = genai.Client(api_key=api_key)
-
-# # Send a message to Gemini
-# # interaction = client.interactions.create(
-# #     model="gemini-3.8-flash",
-# #     input="""
-# #     You are my personal English tutor.
-
-# #     Correct my English sentences.
-# #     Explain my mistakes in simple English.
-# #     Give me a more natural expression.
-# #     Encourage me to try again.
-
-# #     Correct this sentence:
-# #     She go to school every day.
-# #     """
-# # )
-
-# # while True:
-# #     sentence = input("You: ")
-
-# #     if sentence.lower() == "exit":
-# #         print("Goodbye! Keep practicing your English!")
-# #         break
-
-# #     interaction = client.interactions.create(
-# #         model="YOUR_SUPPORTED_MODEL",
-# #         input=f"""
-# #         You are my personal English tutor.
-
-# #         Correct my English sentence:
-# #         {sentence}
-
-# #         Explain my mistakes simply and give me a natural version.
-# #         """
-# #     )
-
-# #    print("Tutor:", interaction.output_text)
-
-# SYSTEM_PROMPT = """
-# You are an expert English teacher.
-
-# Your job is to correct English mistakes accurately.
-
-# When the user sends a sentence:
-# 1. Write the grammatically correct sentence.
-# 2. Explain the mistake in simple English.
-# 3. Give a natural, commonly used version.
-# 4. Do not change the intended meaning.
-# 5. If the sentence is already correct, say so.
-
-# Be careful with English grammar and natural expressions.
-# """
-
-
-
-# # Initialize the conversation history once
-# messages = [
-#     {"role": "system", "content": SYSTEM_PROMPT}
-# ]
-
-# while True:
-#     message = input("You: ").strip()
-
-#     if message.lower() == "exit":
-#         print("Goodbye!")
-#         break
-
-#     if not message:
-#         continue
-
-#     # Add the user's message to the history
-#     messages.append({
-#         "role": "user",
-#         "content": message
-#     })
-
-#     # Send the conversation history to the model
-#     response = ollama.chat(
-#         model="gemma4:latest",
-#         messages=messages
-#     )
-
-#     answer = response["message"]["content"]
-
-#     print("Tutor:", answer)
-
-#     # Add the tutor's answer to the history
-#     messages.append({
-#         "role": "assistant",
-#         "content": answer
-#     })
-
-
-# # while True:
-# #     message = input("You: ")
-
-# #     if message.lower() == "exit":
-# #         print("Goodbye!")
-# #         break
-
-# #     response = ollama.chat(
-# #         model="gemma4:latest",
-# #         # messages=[
-# #         #     {
-# #         #         "role": "user",
-# #         #         "content": message
-# #         #     }
-# #         # ]
-# #         messages = [
-# #      {"role": "system", "content": SYSTEM_PROMPT},
-# #      {"role": "user", "content": message}
-# #  ]
-# #     )
-
-# print("Llama:", response["message"]["content"])
-# #The goal is simple: connect your Python program to Gemini, send it a message, and receive an AI-generated response.
-# #to communicate with gemini and recieve a response we need a client 
-# #client: a variable that stores the object you will use to communicate with Gemini.
-# #genai: the Google Gen AI library that you imported into Python.
-# #Client(...): creates a client that manages communication with Google's AI service.
-# #I understand that genai is an object and client is an method of that object it expect an argument named api_key 
-# #the role of this argument is The role of this argument is to give the client the API key it needs to authenticate your requests  لمصادقة طلباتكto Google's AI service.
-# #بالتونسي: بالضبط، كيف مفتاح دخول يعطي للبرنامج متاعك إمكانية الوصول لخدمة Gemini.
-# # print(interaction.output_text)
-# # interaction → the variable that stores the result of your request to Gemini.
-
-# #.output_text → accesses the text output contained in that result.
-
-# #print() → displays that text in your terminal.
-# # Print Gemini's answer
-# # A while True loop that lets you keep chatting.
-
-# # hhhhhhhhhhh
-
-# # A conversation history stored in messages.
-# print("Tutor")
-# print(data["has_mistake"])
-# print(data["original"])
-# print(data["correction"])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import os
-# from dotenv import load_dotenv
-# from ollama import Client
-# import json
-# import re
-
-
-# # from memory import (
-# #     init_db,
-# #     save_message,
-# #     get_chat_history,
-# # )
-# from memory import (
-#     init_db,
-#     save_message,
-#     get_chat_history,
-#     save_mistake,
-#     get_mistakes,
-# )
-# load_dotenv()
-
-# api_key = os.getenv("OLLAMA_API_KEY")
-
-# if not api_key:
-#     raise RuntimeError(
-#         "OLLAMA_API_KEY not found. Check your .env file."
-#     )
-
-# client = Client(
-#     host="https://ollama.com",
-#     headers={"Authorization": f"Bearer {api_key}"},
-#     timeout=120,
-# )
-
-
-
-
-
-# SYSTEM_PROMPT = """
-# You are a friendly, patient English tutor. Your main goal is to help
-# the user improve their English while having natural, useful conversations.
-
-# For EVERY user message, follow these steps in order.
-
-# STEP 1 — CORRECT THE USER'S ENGLISH
-# Check the user's latest message for grammar, spelling, and word choice.
-# - If there are mistakes, show the corrected sentence.
-# - Briefly explain the important mistakes in simple English.
-# - If the sentence is already correct, say so. Do not invent mistakes.
-# - If useful, provide a more natural expression commonly used in conversation.
-
-# STEP 2 — ANSWER THE ACTUAL MESSAGE
-# After the correction, respond to what the user actually means.
-# - If the user asks a question, answer it directly.
-# - If the user asks about the weather, answer the weather question
-#   if reliable weather information is available. Never invent current weather.
-# - If the user asks for an explanation, explain the subject.
-# - If the user shares an opinion or experience, respond naturally.
-# - If the user says you did not answer a previous question, answer
-#   that unanswered question instead of only correcting the latest message.
-# - Do not let English correction replace the actual answer.
-
-
-# STEP 3 — USE THE PREVIOUS CONVERSATION
-# You may receive previous messages from the current conversation
-# or from earlier sessions saved in the conversation history.
-
-# Before answering any question about the past:
-# 1. Search the available conversation history carefully.
-# 2. Look at both user messages and assistant responses.
-# 3. Search for related wording and meaning, not only exact keywords.
-# 4. If the user asks about an English mistake, identify the original
-#    user sentence and the correction the tutor gave.
-# 5. If the user asks about a correction you made, check the assistant's
-#    previous responses as well as the user's original sentence.
-# 6. Do not say an event never happened merely because you did not
-#    immediately notice it. Check the available history first.
-# 7. Never invent a previous message, correction, or explanation.
-# 8. If the relevant message is not present in the history you received,
-#    explain that you cannot find it in the available history.
-
-# When recalling an English mistake, provide:
-# - Original sentence
-# - Corrected sentence
-# - Brief explanation
-
-# Remember: the current conversation history may contain the answer
-# even if the user describes it using different words.
-
-
-# STEP 4 — CONTINUE THE CONVERSATION
-# When appropriate, ask one short, relevant follow-up question to help
-# the user practise English naturally.
-# Do not ask a follow-up question every time if it would feel unnatural.
-
-# IMPORTANT RULES
-# - Always prioritise both English learning AND the user's actual intention.
-# - Do not assume every message is only an English exercise.
-# - Be friendly, clear, patient, and concise.
-# - Use simple explanations suitable for an English learner.
-# - Do not repeat the same correction unnecessarily.
-# - Keep the correction separate from the answer so both are easy to understand.
-
-
-
-# MANDATORY RESPONSE FORMAT
-
-# For every non-empty user message, use all three headings below,
-# in exactly this order. Do not omit a heading just because the
-# user's English is already correct or the user asks a direct question.
-
-# English correction:
-# - If the user's message contains mistakes, show the corrected version.
-# - If it is already correct, write: "Your sentence is already correct."
-# - Preserve the user's original meaning.
-
-# Why / More natural English:
-# - Briefly explain the important corrections in simple English.
-# - If no correction is needed, say: "No correction is needed."
-# - Offer a more natural alternative only when it is useful.
-# - Never invent an English mistake or describe correct grammar as wrong.
-
-# Answer:
-# - Answer the user's actual question or respond to their message directly.
-# - Do not replace the answer with a grammar lesson.
-# - If the user says you missed a question, answer that question directly.
-# - Keep the answer concise but complete.
-
-# IMPORTANT FORMATTING RULES
-# - Always place "English correction:" first.
-# - Always place "Why / More natural English:" second.
-# - Always place "Answer:" third.
-# - Never start with "Answer:" and then omit the other sections.
-# - Do not repeat the same correction unnecessarily.
-# - Ask at most one relevant follow-up question, and only when useful.
-# - For a short message such as "OK" or "Thanks", keep all sections brief.
-# - Keep the response friendly, clear, and appropriate for an English learner.
-
-
-
-# Continue naturally when appropriate.
-# """
-
-# def detect_english_mistake(user_text, tutor_answer):
-#     """Ask Gemma to identify a genuine mistake in the user's message."""
-
-#     extraction_prompt = """
-# You are an English mistake detector.
-
-# Analyze ONLY the user's message to decide whether it contains
-# a genuine English grammar, spelling, or word-choice mistake.
-
-# The tutor's answer is provided only as context.
-
-# Return valid JSON with exactly these fields:
-# {
-#   "has_mistake": false,
-#   "original_sentence": "",
-#   "correction": "",
-#   "explanation": "",
-#   "category": ""
-# }
-
-# Rules:
-# - If the user's English is correct, set has_mistake to false.
-# - Do not invent mistakes.
-# - If there is a genuine mistake, set has_mistake to true.
-# - Preserve the original wording in original_sentence.
-# - Provide a corrected sentence and a short explanation.
-# - Use a category such as grammar, spelling, vocabulary,
-#   punctuation, or word_choice.
-# - Return only JSON, without Markdown or extra text.
-# """
-
-#     try:
-#         response = client.chat(
-#             model="gemma4:31b",
-#             format="json",
-#             messages=[
-#                 {
-#                     "role": "system",
-#                     "content": extraction_prompt,
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": (
-#                         f"User's message:\n{user_text}\n\n"
-#                         f"Tutor's answer:\n{tutor_answer}"
-#                     ),
-#                 },
-#             ],
-#         )
-
-#         data = json.loads(response["message"]["content"])
-
-#         if not isinstance(data, dict):
-#             return None
-
-#         if data.get("has_mistake") is not True:
-#             return None
-
-#         required_fields = [
-#             "original_sentence",
-#             "correction",
-#             "explanation",
-#             "category",
-#         ]
-
-#         for field in required_fields:
-#             if not isinstance(data.get(field), str):
-#                 return None
-#             if not data[field].strip():
-#                 return None
-
-#         return data
-
-#     except (json.JSONDecodeError, KeyError, TypeError, ValueError) as error:
-#         print("[DEBUG] Could not validate mistake data:", error)
-#         return None
-#     except Exception as error:
-#         print("[DEBUG] Mistake detection failed:", error)
-#         return None
-
-# def save_mistake_if_new(mistake):
-#     """Save a mistake only if the same original/correction is not stored."""
-
-#     def normalize(text):
-#         return " ".join(text.lower().split()).strip()
-
-#     try:
-#         existing_mistakes = get_mistakes()
-
-#         for row in existing_mistakes:
-#             # Database columns: id, original, correction,
-#             # explanation, category, created_at
-#             original = row[1]
-#             correction = row[2]
-
-#             if (
-#                 normalize(original)
-#                 == normalize(mistake["original_sentence"])
-#                 and normalize(correction)
-#                 == normalize(mistake["correction"])
-#             ):
-#                 print("[DEBUG] This mistake is already saved.")
-#                 return False
-
-#         save_mistake(
-#             mistake["original_sentence"],
-#             mistake["correction"],
-#             mistake["explanation"],
-#             mistake["category"],
-#         )
-
-#         print("[DEBUG] New English mistake saved.")
-#         return True
-
-#     except Exception as error:
-#         print("[DEBUG] Could not save English mistake:", error)
-#         return False
-
-
-# # 1. Create the database tables if they do not exist
-# init_db()
-
-
-# # 2. Start with the system instructions
-# messages = [
-#     {
-#         "role": "system",
-#         "content": SYSTEM_PROMPT
-#     }
-# ]
-
-
-# # 3. Load previous conversation messages from the database
-# history = get_chat_history(limit=30)
-
-# print("\n--- DEBUG: SAVED HISTORY ---")
-
-# for role, content in history:
-#     print(f"{role}: {content}")
-
-#     messages.append({
-#         "role": role,
-#         "content": content
-#     })
-
-# print("--- END OF HISTORY ---\n")
-# print("English Tutor is ready!")
-# print("Your recent conversation history has been loaded.")
-# print("Type 'exit' to close the tutor.\n")
-
-
-# # 4. Start the conversation loop
-# # while True:
-
-# #     message = input("You: ").strip()
-
-# #     # Stop the program when the user types exit
-# #     if message.lower() == "exit":
-# #         print("Goodbye! Your conversation has been saved.")
-# #         break
-
-# #     # Ignore empty messages
-# #     if not message:
-# #         continue
-
-# #     # 5. Add the user's message to the conversation
-# #     messages.append({
-# #         "role": "user",
-# #         "content": message
-# #     })
-
-# #     # Save the user's message in the database
-# #     save_message("user", message)
-
-# #     try:
-# #         # 6. Send the conversation history to Ollama
-# #         response = client.chat(
-# #         model="gemma4:31b",
-# #         messages=messages
-# #             )
-# #         # Extract the tutor's answer
-# #         answer = response["message"]["content"]
-
-# #         # Display the answer
-# #         print("\nTutor:", answer, "\n")
-
-# #         # 7. Add the tutor's answer to the conversation history
-# #         messages.append({
-# #             "role": "assistant",
-# #             "content": answer
-# #         })
-
-# #         # Save the tutor's answer in the database
-# #         save_message("assistant", answer)
-# #         messages = [messages[0]] + messages[-10:]
-# #     except Exception as error:
-# #         print("An error occurred:", error)
-# #         print("Please check that Ollama is running and the model is available.")
-
-
-
-# # 4. Start the conversation loop
-# while True:
-#     message = input("You: ").strip()
-
-#     # Stop the program when the user types exit
-#     if message.lower() == "exit":
-#         print("Goodbye! Your conversation has been saved.")
-#         break
-
-#     # Ignore empty messages
-#     if not message:
-#         continue
-
-#     try:
-#         # 5. Save the user's message first
-#         save_message("user", message)
-
-#         # 6. Reload recent history from SQLite for EVERY question
-#         # history = get_chat_history(limit=30)
-        
-#         # 6. Load conversation history and structured mistakes
-#         history = get_chat_history(limit=30)
-#         saved_mistakes = get_mistakes()
-
-#         # Prepare the saved mistakes for Gemma
-#         mistake_memory = (
-#             "\n\nSTRUCTURED ENGLISH MISTAKE MEMORY:\n"
-#             "When asked about saved mistakes, use ONLY the records "
-#             "listed below. Do not add examples from conversation history.\n"
-#         )
-
-#         # Remove duplicate original/correction pairs from the context
-#         unique_mistakes = []
-#         seen_mistakes = set()
-
-#         for row in reversed(saved_mistakes):
-#             original = row[1]
-#             correction = row[2]
-
-#             key = (
-#                 " ".join(original.lower().split()),
-#                 " ".join(correction.lower().split())
-#             )
-
-#             if key in seen_mistakes:
-#                 continue
-
-#             seen_mistakes.add(key)
-#             unique_mistakes.append(row)
-
-#             if len(unique_mistakes) >= 10:
-#                 break
-
-#         if unique_mistakes:
-#             for row in unique_mistakes:
-#                 _, original, correction, explanation, category, _ = row
-
-#                 mistake_memory += (
-#                     f"\nOriginal: {original}"
-#                     f"\nCorrection: {correction}"
-#                     f"\nExplanation: {explanation}"
-#                     f"\nCategory: {category}\n"
-#                 )
-#         else:
-#             mistake_memory += "\nNo saved mistakes were found.\n"
-
-#         # Send both the tutor instructions and saved mistakes to Gemma
-#         messages = [
-#             {
-#                 "role": "system",
-#                 "content": SYSTEM_PROMPT + mistake_memory
-#             }
-#         ]
-
-
-#         # Keep the system prompt, then add the saved conversation
-#         messages = [
-#             {"role": "system", "content": SYSTEM_PROMPT}
-#         ]
-
-#         for role, content in history:
-#             messages.append({
-#                 "role": role,
-#                 "content": content
-#             })
-
-#         # DEBUG: see how much history is sent to the model
-#         print(f"\n[DEBUG] Sending {len(history)} saved messages to Gemma.")
-
-#         # 7. Send the conversation to Ollama Cloud
-#         response = client.chat(
-#             model="gemma4:31b",
-#             messages=messages
-#         )
-
-#         # Extract and display the tutor's answer
-#         answer = response["message"]["content"]
-#         print("\nTutor:", answer, "\n")
-
-#         # 8. Save the tutor's answer
-
-#         save_message("assistant", answer)
-#         # 9. Detect and save a genuine English mistake
-
-#         mistake = detect_english_mistake(message, answer)
-
-#         if mistake:
-#             save_mistake_if_new(mistake)
-
-#     except Exception as error:
-#         print("An error occurred:", error)
-#         print("Check your Ollama Cloud connection and model.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import os
-# import json
-
-# from dotenv import load_dotenv
-# from ollama import Client
-
-# from memory import (
-#     init_db,
-#     save_message,
-#     get_chat_history,
-#     save_mistake,
-#     get_mistakes,
-# )
-
-
-# # ============================================================
-# # 1. CONNECT TO OLLAMA CLOUD
-# # ============================================================
-
-# load_dotenv()
-
-# api_key = os.getenv("OLLAMA_API_KEY")
-
-# if not api_key:
-#     raise RuntimeError(
-#         "OLLAMA_API_KEY not found. Check your .env file."
-#     )
-
-# client = Client(
-#     host="https://ollama.com",
-#     headers={"Authorization": f"Bearer {api_key}"},
-#     timeout=120,
-# )
-
-
-# # ============================================================
-# # 2. ENGLISH TUTOR INSTRUCTIONS
-# # ============================================================
-
-# SYSTEM_PROMPT = """
-# You are a friendly, patient English tutor. Your main goal is to help
-# the user improve their English while having natural, useful conversations.
-
-# For EVERY user message, follow these steps in order.
-
-# STEP 1 — CORRECT THE USER'S ENGLISH
-# - Check grammar, spelling, punctuation, and word choice.
-# - If there are mistakes, show the corrected sentence.
-# - Briefly explain important mistakes in simple English.
-# - If the sentence is already correct, say so. Do not invent mistakes.
-# - Preserve the user's original meaning.
-# - Offer a more natural expression when useful.
-
-# STEP 2 — ANSWER THE ACTUAL MESSAGE
-# - Answer the user's actual question directly.
-# - Do not let English correction replace the actual answer.
-# - Respond naturally to opinions and experiences.
-# - If the user says you missed a question, answer that question.
-# - Never invent current information or previous events.
-
-# STEP 3 — USE PREVIOUS CONVERSATION
-# - You may receive previous messages from earlier sessions.
-# - Check both user messages and assistant responses.
-# - Search for related wording and meaning, not only exact keywords.
-# - When recalling an English mistake, provide the original sentence,
-#   corrected sentence, and a brief explanation.
-# - Never invent a previous message or correction.
-# - If the relevant message is unavailable, explain that clearly.
-
-# STEP 4 — CONTINUE NATURALLY
-# - Ask at most one short, relevant follow-up question when useful.
-# - Do not ask a follow-up question every time.
-
-# MANDATORY RESPONSE FORMAT
-
-# For every non-empty user message, use all three headings
-# in exactly this order:
-
-# English correction:
-# - Show the corrected sentence, or say:
-#   "Your sentence is already correct."
-
-# Why / More natural English:
-# - Explain important corrections briefly.
-# - If no correction is needed, say:
-#   "No correction is needed."
-
-# Answer:
-# - Answer the user's actual question or respond to their message.
-# - Keep the response concise but complete.
-
-# FORMATTING RULES
-# - Always use the three headings in the specified order.
-# - Do not invent English mistakes.
-# - Do not repeat corrections unnecessarily.
-# - Keep explanations friendly and appropriate for an English learner.
-# """
-
-
-# # ============================================================
-# # 3. DETECT A GENUINE ENGLISH MISTAKE
-# # ============================================================
-
-# def detect_english_mistake(user_text, tutor_answer):
-#     """
-#     Ask Gemma to identify a genuine English mistake.
-#     Return validated mistake data, or None.
-#     """
-
-#     extraction_prompt = """
-# You are an English mistake detector.
-
-# Analyze ONLY the user's message to decide whether it contains
-# a genuine English grammar, spelling, punctuation, or word-choice mistake.
-
-# The tutor's answer is provided only as context.
-
-# Return valid JSON with exactly these fields:
-# {
-#     "has_mistake": false,
-#     "original_sentence": "",
-#     "correction": "",
-#     "explanation": "",
-#     "category": ""
-# }
-
-# Rules:
-# - If the user's English is correct, set has_mistake to false.
-# - Do not invent mistakes.
-# - If a genuine mistake exists, set has_mistake to true.
-# - Preserve the original wording in original_sentence.
-# - Provide the corrected sentence and a short explanation.
-# - Use a category such as grammar, spelling, vocabulary,
-#   punctuation, or word_choice.
-# - Return JSON only, without Markdown or additional text.
-# """
-
-#     try:
-#         response = client.chat(
-#             model="gemma4:31b",
-#             format="json",
-#             messages=[
-#                 {
-#                     "role": "system",
-#                     "content": extraction_prompt,
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": (
-#                         f"User's message:\n{user_text}\n\n"
-#                         f"Tutor's answer:\n{tutor_answer}"
-#                     ),
-#                 },
-#             ],
-#         )
-
-#         data = json.loads(response["message"]["content"])
-
-#         if not isinstance(data, dict):
-#             return None
-
-#         if data.get("has_mistake") is not True:
-#             return None
-
-#         required_fields = [
-#             "original_sentence",
-#             "correction",
-#             "explanation",
-#             "category",
-#         ]
-
-#         for field in required_fields:
-#             if not isinstance(data.get(field), str):
-#                 return None
-
-#             if not data[field].strip():
-#                 return None
-
-#         return data
-
-#     except (json.JSONDecodeError, KeyError, TypeError, ValueError) as error:
-#         print("[DEBUG] Could not validate mistake data:", error)
-#         return None
-
-#     except Exception as error:
-#         print("[DEBUG] Mistake detection failed:", error)
-#         return None
-
-
-# # ============================================================
-# # 4. SAVE A MISTAKE ONLY IF IT IS NOT ALREADY STORED
-# # ============================================================
-
-# def save_mistake_if_new(mistake):
-#     """
-#     Save a mistake unless the same original/correction pair exists.
-#     """
-
-#     def normalize(text):
-#         return " ".join(text.lower().split()).strip()
-
-#     try:
-#         existing_mistakes = get_mistakes()
-
-#         for row in existing_mistakes:
-#             # Database columns:
-#             # id, original, correction, explanation, category, created_at
-#             original = row[1]
-#             correction = row[2]
-
-#             if (
-#                 normalize(original)
-#                 == normalize(mistake["original_sentence"])
-#                 and normalize(correction)
-#                 == normalize(mistake["correction"])
-#             ):
-#                 print("[DEBUG] This mistake is already saved.")
-#                 return False
-
-#         save_mistake(
-#             mistake["original_sentence"],
-#             mistake["correction"],
-#             mistake["explanation"],
-#             mistake["category"],
-#         )
-
-#         print("[DEBUG] New English mistake saved.")
-#         return True
-
-#     except Exception as error:
-#         print("[DEBUG] Could not save English mistake:", error)
-#         return False
-
-
-# # ============================================================
-# # 5. PREPARE STRUCTURED MISTAKE MEMORY FOR GEMMA
-# # ============================================================
-
-# def build_mistake_memory():
-#     """
-#     Read saved mistakes, remove duplicate pairs from the context,
-#     and return a text block for the tutor's system instructions.
-#     """
-
-#     saved_mistakes = get_mistakes()
-
-#     unique_mistakes = []
-#     seen_mistakes = set()
-
-#     # Examine newer records first.
-#     for row in reversed(saved_mistakes):
-#         original = row[1]
-#         correction = row[2]
-
-#         key = (
-#             " ".join(original.lower().split()),
-#             " ".join(correction.lower().split()),
-#         )
-
-#         if key in seen_mistakes:
-#             continue
-
-#         seen_mistakes.add(key)
-#         unique_mistakes.append(row)
-
-#         # Include at most 10 unique mistake pairs.
-#         if len(unique_mistakes) >= 10:
-#             break
-
-#     mistake_memory = """
-# STRUCTURED ENGLISH MISTAKE MEMORY — DATABASE RECORDS:
-
-# When the user asks about mistakes saved in structured memory,
-# use ONLY the database records listed below for that list.
-# Do not add examples from conversation history.
-# Do not invent or combine mistakes.
-# Preserve each original sentence and correction exactly.
-# """
-
-#     if unique_mistakes:
-#         for row in unique_mistakes:
-#             _, original, correction, explanation, category, _ = row
-
-#             mistake_memory += (
-#                 f"\nOriginal: {original}"
-#                 f"\nCorrection: {correction}"
-#                 f"\nExplanation: {explanation}"
-#                 f"\nCategory: {category}\n"
-#             )
-#     else:
-#         mistake_memory += (
-#             "\nNo structured English mistakes have been saved.\n"
-#         )
-
-#     return mistake_memory, len(unique_mistakes)
-
-
-# # ============================================================
-# # 6. INITIALIZE THE DATABASE AND START THE TUTOR
-# # ============================================================
-
-# init_db()
-
-# print("\nEnglish Tutor is ready!")
-# print("Your conversation history and saved mistakes are available.")
-# print("Type 'exit' to close the tutor.\n")
-
-
-# # ============================================================
-# # 7. MAIN CONVERSATION LOOP
-# # ============================================================
-
-# while True:
-#     message = input("You: ").strip()
-
-#     # Exit the tutor.
-#     if message.lower() == "exit":
-#         print("Goodbye! Your conversation has been saved.")
-#         break
-
-#     # Ignore empty messages.
-#     if not message:
-#         continue
-
-#     try:
-#         # Save the user's message first.
-#         save_message("user", message)
-
-#         # Load the most recent conversation messages.
-#         history = get_chat_history(limit=30)
-
-#         # Load and prepare structured mistake memory.
-#         mistake_memory, mistake_count = build_mistake_memory()
-
-#         # Build the system message ONCE.
-#         # This is important: do not replace this messages list later.
-#         messages = [
-#             {
-#                 "role": "system",
-#                 "content": SYSTEM_PROMPT + "\n\n" + mistake_memory,
-#             }
-#         ]
-
-#         # Append the saved conversation history.
-#         for role, content in history:
-#             messages.append(
-#                 {
-#                     "role": role,
-#                     "content": content,
-#                 }
-#             )
-
-#         print(
-#             f"\n[DEBUG] Sending {len(history)} conversation messages "
-#             f"and {mistake_count} unique saved mistakes to Gemma."
-#         )
-
-#         # Ask Gemma to respond using the history and mistake memory.
-#         response = client.chat(
-#             model="gemma4:31b",
-#             messages=messages,
-#         )
-
-#         # Extract and display the tutor's answer.
-#         answer = response["message"]["content"]
-#         print("\nTutor:", answer, "\n")
-
-#         # Save the tutor's answer in the conversation database.
-#         save_message("assistant", answer)
-
-#         # Detect and save a genuine English mistake.
-#         # This happens after displaying the answer to the user.
-#         mistake = detect_english_mistake(message, answer)
-
-#         if mistake:
-#             save_mistake_if_new(mistake)
-
-#     except Exception as error:
-#         print("An error occurred:", error)
-#         print("Check your Ollama Cloud connection, model, and database.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import os
-# import json
-
-# from dotenv import load_dotenv
-# from ollama import Client
-
-# from memory import (
-#     init_db,
-#     save_message,
-#     get_chat_history,
-#     save_mistake,
-#     get_mistakes,
-#     get_due_reviews,
-#     record_review,
-#     REVIEW_INTERVALS,
-# )
-
-
-# # ============================================================
-# # 1. CONNECT TO OLLAMA CLOUD
-# # ============================================================
-
-# load_dotenv()
-
-# api_key = os.getenv("OLLAMA_API_KEY")
-
-# if not api_key:
-#     raise RuntimeError(
-#         "OLLAMA_API_KEY not found. Check your .env file."
-#     )
-
-# client = Client(
-#     host="https://ollama.com",
-#     headers={"Authorization": f"Bearer {api_key}"},
-#     timeout=120,
-# )
-
-# MODEL = "gemma4:31b"
-
-
-# # ============================================================
-# # 2. ENGLISH TUTOR INSTRUCTIONS
-# # ============================================================
-
-# SYSTEM_PROMPT = """
-# You are a friendly, patient English tutor.
-
-# Your main goal is to help the learner improve their English
-# through natural conversation, correction, practice, and review.
-
-# For every non-empty user message:
-
-# STEP 1 — ENGLISH CORRECTION
-# - Correct genuine grammar, spelling, punctuation, and word-choice
-#   mistakes in the user's message.
-# - Preserve the original meaning.
-# - If the English is already correct, say so.
-# - Never invent mistakes.
-# - Explain important corrections in simple English.
-
-# STEP 2 — ANSWER THE ACTUAL MESSAGE
-# - Answer the user's actual question.
-# - Do not replace the answer with a grammar lesson.
-# - Respond naturally to opinions and experiences.
-# - Never invent current information or previous events.
-
-# STEP 3 — PERSONALIZED TEACHING
-# - Use the supplied structured mistake memory.
-# - Recognize when the learner repeats a known mistake.
-# - When relevant, gently remind the learner of the earlier correction.
-# - Do not mention an old mistake in every conversation.
-# - When the learner is practicing a rule, give useful feedback.
-# - Do not claim that a rule is mastered after only one answer.
-
-# STEP 4 — REVIEW QUESTIONS
-# - If review instructions are supplied, follow them.
-# - Ask the learner to correct or complete the practice sentence.
-# - Do not reveal the correct answer before the learner tries.
-# - If the learner does not answer the review question, answer their
-#   actual message and gently keep the review question available.
-# - If they answer, explain whether they applied the rule correctly.
-
-# STEP 5 — NATURAL CONVERSATION
-# - Ask at most one short, relevant follow-up question when useful.
-# - Do not ask a follow-up question every time.
-
-# Use exactly these three headings in this order:
-
-# English correction:
-# Why / More natural English:
-# Answer:
-
-# Be friendly, clear, and concise.
-# """
-
-
-# # ============================================================
-# # 3. DETECT AND VALIDATE ENGLISH MISTAKES
-# # ============================================================
-
-# def detect_english_mistake(user_text, tutor_answer):
-#     """Ask the model to identify a genuine English mistake."""
-
-#     extraction_prompt = """
-# You are an English mistake detector.
-
-# Analyze the user's message, not the tutor's message.
-
-# Return valid JSON with exactly these fields:
-# {
-#     "has_mistake": false,
-#     "original_sentence": "",
-#     "correction": "",
-#     "explanation": "",
-#     "category": ""
-# }
-
-# Rules:
-# - If the user's English is correct, has_mistake must be false.
-# - Do not invent mistakes.
-# - Preserve the original wording in original_sentence.
-# - If a genuine mistake exists, provide its correction and explanation.
-# - Use a category such as grammar, spelling, vocabulary,
-#   punctuation, or word_choice.
-# - Return JSON only, without Markdown.
-# """
-
-#     try:
-#         response = client.chat(
-#             model=MODEL,
-#             format="json",
-#             messages=[
-#                 {
-#                     "role": "system",
-#                     "content": extraction_prompt,
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": (
-#                         f"User's message:\n{user_text}\n\n"
-#                         f"Tutor's answer:\n{tutor_answer}"
-#                     ),
-#                 },
-#             ],
-#         )
-
-#         data = json.loads(response["message"]["content"])
-
-#         if not isinstance(data, dict):
-#             return None
-
-#         if data.get("has_mistake") is not True:
-#             return None
-
-#         required_fields = [
-#             "original_sentence",
-#             "correction",
-#             "explanation",
-#             "category",
-#         ]
-
-#         for field in required_fields:
-#             if not isinstance(data.get(field), str):
-#                 return None
-
-#             if not data[field].strip():
-#                 return None
-
-#         return data
-
-#     except Exception as error:
-#         print("[DEBUG] Mistake detection failed:", error)
-#         return None
-
-
-# # ============================================================
-# # 4. SAVE A MISTAKE ONLY IF IT IS NEW
-# # ============================================================
-
-# def normalize(text):
-#     return " ".join(text.lower().split()).strip()
-
-
-# def save_mistake_if_new(mistake):
-#     """Avoid saving the same original/correction pair repeatedly."""
-
-#     try:
-#         for row in get_mistakes():
-#             original = row[1]
-#             correction = row[2]
-
-#             if (
-#                 normalize(original)
-#                 == normalize(mistake["original_sentence"])
-#                 and normalize(correction)
-#                 == normalize(mistake["correction"])
-#             ):
-#                 print("[DEBUG] This mistake is already saved.")
-#                 return False
-
-#         save_mistake(
-#             mistake["original_sentence"],
-#             mistake["correction"],
-#             mistake["explanation"],
-#             mistake["category"],
-#         )
-
-#         print("[DEBUG] New English mistake saved.")
-#         return True
-
-#     except Exception as error:
-#         print("[DEBUG] Could not save English mistake:", error)
-#         return False
-
-
-# # ============================================================
-# # 5. BUILD STRUCTURED MISTAKE MEMORY
-# # ============================================================
-
-# def build_mistake_memory():
-#     """Provide up to 10 unique saved mistakes to the tutor."""
-
-#     saved_mistakes = get_mistakes()
-
-#     unique_mistakes = []
-#     seen_mistakes = set()
-
-#     for row in reversed(saved_mistakes):
-#         original = row[1]
-#         correction = row[2]
-
-#         key = (normalize(original), normalize(correction))
-
-#         if key in seen_mistakes:
-#             continue
-
-#         seen_mistakes.add(key)
-#         unique_mistakes.append(row)
-
-#         if len(unique_mistakes) >= 10:
-#             break
-
-#     memory_text = """
-# STRUCTURED ENGLISH MISTAKE MEMORY — DATABASE RECORDS
-
-# When asked to list saved mistakes, use only the records below.
-# Do not add examples from conversation history.
-# Preserve the original sentences and corrections exactly.
-# """
-
-#     if not unique_mistakes:
-#         memory_text += "\nNo structured English mistakes are saved.\n"
-
-#     for row in unique_mistakes:
-#         _, original, correction, explanation, category, created_at = row
-
-#         memory_text += (
-#             f"\nOriginal: {original}"
-#             f"\nCorrection: {correction}"
-#             f"\nExplanation: {explanation}"
-#             f"\nCategory: {category}\n"
-#         )
-
-#     return memory_text, len(unique_mistakes)
-
-
-# # ============================================================
-# # 6. EVALUATE A REVIEW ANSWER
-# # ============================================================
-
-# def evaluate_review_answer(user_answer, original, correction):
-#     """
-#     Determine whether the learner attempted the review and
-#     whether their answer correctly applies the target rule.
-
-#     Returns:
-#         {"attempted": bool, "correct": bool, "reason": str}
-#     """
-
-#     evaluation_prompt = """
-# You are evaluating one English learning review.
-
-# The learner is trying to correct a previously studied sentence.
-
-# Return valid JSON with exactly these fields:
-# {
-#     "attempted": false,
-#     "correct": false,
-#     "reason": ""
-# }
-
-# Rules:
-# - attempted is true only if the learner actually tries to answer
-#   or correct the target sentence.
-# - Greetings, unrelated questions, and unrelated comments are not
-#   attempts. In these cases, set attempted to false.
-# - correct is true only if the learner's answer correctly applies
-#   the target rule and communicates the intended meaning.
-# - Accept reasonable alternative wording.
-# - Ignore minor punctuation differences when judging the target rule.
-# - Do not mark an unrelated response as incorrect.
-# - Explain the result briefly.
-# - Return JSON only.
-# """
-
-#     try:
-#         response = client.chat(
-#             model=MODEL,
-#             format="json",
-#             messages=[
-#                 {
-#                     "role": "system",
-#                     "content": evaluation_prompt,
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": (
-#                         f"Original sentence to correct: {original}\n"
-#                         f"Expected correction: {correction}\n"
-#                         f"Learner's answer: {user_answer}"
-#                     ),
-#                 },
-#             ],
-#         )
-
-#         data = json.loads(response["message"]["content"])
-
-#         if not isinstance(data, dict):
-#             return {
-#                 "attempted": False,
-#                 "correct": False,
-#                 "reason": "The answer could not be evaluated.",
-#             }
-
-#         if not isinstance(data.get("attempted"), bool):
-#             raise ValueError("Invalid attempted value")
-
-#         if not isinstance(data.get("correct"), bool):
-#             raise ValueError("Invalid correct value")
-
-#         if not isinstance(data.get("reason"), str):
-#             raise ValueError("Invalid reason value")
-
-#         return data
-
-#     except Exception as error:
-#         print("[DEBUG] Review evaluation failed:", error)
-
-#         return {
-#             "attempted": False,
-#             "correct": False,
-#             "reason": "The review could not be evaluated this time.",
-#         }
-
-
-# # ============================================================
-# # 7. INITIALIZE THE DATABASE
-# # ============================================================
-
-# init_db()
-
-# print("\nEnglish Tutor is ready!")
-# print("Conversation history and structured mistake memory loaded.")
-# print("Scheduled mistake reviews are enabled.")
-# print("Type 'exit' to close the tutor.\n")
-
-
-# # ============================================================
-# # 8. MAIN CONVERSATION LOOP
-# # ============================================================
-
-# # A review remains pending during this running session until the
-# # learner attempts it. If the program closes first, the review
-# # remains due in SQLite and can be asked again next time.
-# pending_review = None
-
-
-# while True:
-#     message = input("You: ").strip()
-
-#     if message.lower() == "exit":
-#         print("Goodbye! Your conversation has been saved.")
-#         break
-
-#     if not message:
-#         continue
-
-#     try:
-#         # Save the user's message.
-#         save_message("user", message)
-
-#         # ----------------------------------------------------
-#         # A. Evaluate a pending review, if there is one
-#         # ----------------------------------------------------
-
-#         review_feedback = ""
-
-#         if pending_review is not None:
-#             (
-#                 review_id,
-#                 original,
-#                 correction,
-#                 explanation,
-#                 category,
-#                 interval_days,
-#                 review_count,
-#                 correct_count,
-#                 next_review_at,
-#             ) = pending_review
-
-#             evaluation = evaluate_review_answer(
-#                 message,
-#                 original,
-#                 correction,
-#             )
-
-#             if evaluation["attempted"]:
-#                 result = record_review(
-#                     review_id,
-#                     evaluation["correct"],
-#                 )
-
-#                 if evaluation["correct"]:
-#                     review_feedback = (
-#                         "\nREVIEW RESULT: The learner answered correctly."
-#                         f"\nFeedback: {evaluation['reason']}"
-#                         f"\nNext review interval: "
-#                         f"{result['next_interval_days']} days."
-#                         f"\nNext review date: {result['next_review_at']}."
-#                         "\nCongratulate the learner appropriately and "
-#                         "reinforce the rule briefly."
-#                     )
-#                 else:
-#                     review_feedback = (
-#                         "\nREVIEW RESULT: The learner needs more practice."
-#                         f"\nCorrect sentence: {correction}"
-#                         f"\nExplanation: {explanation}"
-#                         f"\nFeedback: {evaluation['reason']}"
-#                         f"\nNext review interval: "
-#                         f"{result['next_interval_days']} day(s)."
-#                         "\nExplain the rule kindly without discouraging "
-#                         "the learner."
-#                     )
-
-#                 print(
-#                     "[DEBUG] Review recorded:",
-#                     result,
-#                 )
-
-#                 # The review has been attempted. Do not quiz again
-#                 # during this same turn.
-#                 pending_review = None
-
-#             else:
-#                 review_feedback = (
-#                     "\nA review question is still waiting for the learner."
-#                     f"\nTarget sentence: {original}"
-#                     "\nDo not mark this as wrong because the learner "
-#                     "has not attempted the review."
-#                     "\nAnswer the learner's actual message, then gently "
-#                     "repeat the review question without revealing "
-#                     "the correction."
-#                 )
-
-#         # ----------------------------------------------------
-#         # B. If no review is pending, find one that is due
-#         # ----------------------------------------------------
-
-#         due_review = None
-
-#         if pending_review is None and not review_feedback:
-#             due_reviews = get_due_reviews(limit=1)
-
-#             if due_reviews:
-#                 due_review = due_reviews[0]
-
-#         # ----------------------------------------------------
-#         # C. Load conversation history and saved mistake memory
-#         # ----------------------------------------------------
-
-#         history = get_chat_history(limit=30)
-#         mistake_memory, mistake_count = build_mistake_memory()
-
-#         system_content = SYSTEM_PROMPT + "\n\n" + mistake_memory
-
-#         if review_feedback:
-#             system_content += "\n\n" + review_feedback
-
-#         if due_review is not None:
-#             (
-#                 review_id,
-#                 original,
-#                 correction,
-#                 explanation,
-#                 category,
-#                 interval_days,
-#                 review_count,
-#                 correct_count,
-#                 next_review_at,
-#             ) = due_review
-
-#             system_content += f"""
-
-# SCHEDULED REVIEW — ASK THIS NOW
-
-# A previously saved mistake is due for review.
-
-# Original sentence: {original}
-# Correct sentence: {correction}
-# Explanation: {explanation}
-
-# Ask the learner to correct the original sentence.
-# Do not reveal the correction in your question.
-# Make the question natural and concise.
-# Continue to answer the learner's actual message as well.
-# """
-
-#         # ----------------------------------------------------
-#         # D. Send the conversation to Gemma
-#         # ----------------------------------------------------
-
-#         messages = [
-#             {
-#                 "role": "system",
-#                 "content": system_content,
-#             }
-#         ]
-
-#         for role, content in history:
-#             messages.append(
-#                 {
-#                     "role": role,
-#                     "content": content,
-#                 }
-#             )
-
-#         print(
-#             f"\n[DEBUG] Sending {len(history)} conversation messages "
-#             f"and {mistake_count} unique saved mistakes to Gemma."
-#         )
-
-#         response = client.chat(
-#             model=MODEL,
-#             messages=messages,
-#         )
-
-#         answer = response["message"]["content"]
-
-#         print("\nTutor:", answer, "\n")
-
-#         # Save the tutor's answer.
-#         save_message("assistant", answer)
-
-#         # If a due review was just presented, keep it pending
-#         # for the learner's next response.
-#         if due_review is not None:
-#             pending_review = due_review
-
-#         # ----------------------------------------------------
-#         # E. Detect and save a new English mistake
-#         # ----------------------------------------------------
-
-#         mistake = detect_english_mistake(message, answer)
-
-#         if mistake:
-#             save_mistake_if_new(mistake)
-
-#     except Exception as error:
-#         print("\nAn error occurred:", error)
-#         print(
-#             "Check your Ollama Cloud connection, model, "
-#             "and database."
-#         )
-
-
-
-
-
-
-# import os
-# import json
-
-# from dotenv import load_dotenv
-# from ollama import Client
-
-# from memory import (
-#     init_db,
-#     save_message,
-#     get_chat_history,
-#     save_mistake,
-#     get_mistakes,
-#     get_due_mistakes,
-#     record_review_result,
-#     get_learning_stats,
-# )
-
-
-# # ============================================================
-# # 1. CONNECT TO OLLAMA CLOUD
-# # ============================================================
-
-# load_dotenv()
-
-# api_key = os.getenv("OLLAMA_API_KEY")
-
-# if not api_key:
-#     raise RuntimeError(
-#         "OLLAMA_API_KEY not found. Check your .env file."
-#     )
-
-# client = Client(
-#     host="https://ollama.com",
-#     headers={"Authorization": f"Bearer {api_key}"},
-#     timeout=120,
-# )
-
-# MODEL = "gemma4:31b"
-
-
-# # ============================================================
-# # 2. ENGLISH TUTOR INSTRUCTIONS
-# # Original Steps 1-4 are preserved.
-# # Phase 3 teacher rules are added below them.
-# # ============================================================
-
-# SYSTEM_PROMPT = """
-# You are a friendly, patient English tutor. Your main goal is to help
-# the user improve their English while having natural, useful conversations.
-
-# For EVERY user message, follow these steps in order.
-
-# STEP 1 — CORRECT THE USER'S ENGLISH
-# - Check grammar, spelling, punctuation, and word choice.
-# - If there are mistakes, show the corrected sentence.
-# - Briefly explain important mistakes in simple English.
-# - If the sentence is already correct, say so. Do not invent mistakes.
-# - Preserve the user's original meaning.
-# - Offer a more natural expression when useful.
-
-# STEP 2 — ANSWER THE ACTUAL MESSAGE
-# - Answer the user's actual question directly.
-# - Do not let English correction replace the actual answer.
-# - Respond naturally to opinions and experiences.
-# - If the user says you missed a question, answer that question.
-# - Never invent current information or previous events.
-
-# STEP 3 — USE PREVIOUS CONVERSATION
-# - You may receive previous messages from earlier sessions.
-# - Check both user messages and assistant responses.
-# - Search for related wording and meaning, not only exact keywords.
-# - When recalling an English mistake, provide the original sentence,
-#   corrected sentence, and a brief explanation.
-# - Never invent a previous message or correction.
-# - If the relevant message is unavailable, explain that clearly.
-
-# STEP 4 — CONTINUE NATURALLY
-# - Ask at most one short, relevant follow-up question when useful.
-# - Do not ask a follow-up question every time.
-
-# STEP 5 — ACT AS A PERSONAL ENGLISH TEACHER
-# - Use the structured learner memory provided by the application.
-# - Review mistakes when their scheduled review time has arrived.
-# - A review may be useful even when the current conversation topic
-#   is unrelated to the old mistake.
-# - Answer the user's current question before introducing an
-#   unrelated review.
-# - Keep reminders brief and avoid repeatedly interrupting the user.
-# - Do not invent review dates, saved mistakes, or learning results.
-# - Do not claim that the user has mastered a rule based on one
-#   correct answer.
-# - Recognize genuine progress and encourage the learner.
-
-# STEP 6 — TEACH THROUGH PRACTICE
-# - When a saved mistake is due for review, offer a short exercise
-#   that tests the underlying English rule.
-# - When appropriate, ask the user to answer before revealing
-#   the correct answer.
-# - Explain the result in simple, friendly English.
-# - If the user answers incorrectly, explain the error and provide
-#   another suitable practice opportunity.
-# - If the user answers correctly, acknowledge the success.
-# - Never claim that an answer was recorded unless the application
-#   actually records it.
-# - Do not turn every ordinary conversation into an exercise.
-
-# STEP 7 — ADAPT TO LEARNING PROGRESS
-# - Use available review results and learning statistics.
-# - Give more practice to rules the user repeatedly gets wrong.
-# - Gradually revisit rules that the user answers correctly.
-# - Use scheduled review information supplied by the application;
-#   do not invent or calculate a review schedule yourself.
-# - If no review is due, continue the conversation normally.
-
-# MANDATORY RESPONSE FORMAT
-
-# For every non-empty user message, use all three headings
-# in exactly this order:
-
-# English correction:
-# - Show the corrected sentence, or say:
-#   "Your sentence is already correct."
-
-# Why / More natural English:
-# - Explain important corrections briefly.
-# - If no correction is needed, say:
-#   "No correction is needed."
-
-# Answer:
-# - Answer the user's actual question or respond to their message.
-# - Keep the response concise but complete.
-
-# FORMATTING RULES
-# - Always use the three headings in the specified order.
-# - Do not invent English mistakes.
-# - Do not repeat corrections unnecessarily.
-# - Keep explanations friendly and appropriate for an English learner.
-# - Preserve natural conversation and prioritize the user's question.
-# """
-
-
-# # ============================================================
-# # 3. DETECT A GENUINE ENGLISH MISTAKE
-# # ============================================================
-
-# def detect_english_mistake(user_text, tutor_answer):
-#     """Identify a genuine English mistake using Gemma."""
-
-#     extraction_prompt = """
-# You are an English mistake detector.
-
-# Analyze ONLY the user's latest message to decide whether it contains
-# a genuine English grammar, spelling, punctuation, or word-choice mistake.
-
-# The tutor's answer is provided only as context.
-
-# Return valid JSON with exactly these fields:
-# {
-#     "has_mistake": false,
-#     "original_sentence": "",
-#     "correction": "",
-#     "explanation": "",
-#     "category": ""
-# }
-
-# Rules:
-# - If the user's English is correct, set has_mistake to false.
-# - Do not invent mistakes.
-# - If a genuine mistake exists, set has_mistake to true.
-# - Preserve the original wording in original_sentence.
-# - Provide the corrected sentence and a short explanation.
-# - Use a category such as grammar, spelling, vocabulary,
-#   punctuation, or word_choice.
-# - Do not treat a question about memory or the tutor as an
-#   English practice sentence unless it contains a genuine error.
-# - Return JSON only, without Markdown or additional text.
-# """
-
-#     try:
-#         response = client.chat(
-#             model=MODEL,
-#             format="json",
-#             messages=[
-#                 {
-#                     "role": "system",
-#                     "content": extraction_prompt,
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": (
-#                         f"User's message:\n{user_text}\n\n"
-#                         f"Tutor's answer:\n{tutor_answer}"
-#                     ),
-#                 },
-#             ],
-#         )
-
-#         data = json.loads(response["message"]["content"])
-
-#         if not isinstance(data, dict):
-#             return None
-
-#         if data.get("has_mistake") is not True:
-#             return None
-
-#         required_fields = [
-#             "original_sentence",
-#             "correction",
-#             "explanation",
-#             "category",
-#         ]
-
-#         for field in required_fields:
-#             if not isinstance(data.get(field), str):
-#                 return None
-#             if not data[field].strip():
-#                 return None
-
-#         return data
-
-#     except Exception as error:
-#         print("[DEBUG] Mistake detection failed:", error)
-#         return None
-
-
-# # ============================================================
-# # 4. SAVE A MISTAKE ONLY IF IT IS NOT ALREADY STORED
-# # ============================================================
-
-# def normalize(text):
-#     """Normalize text for duplicate comparison."""
-#     return " ".join(text.lower().split()).strip()
-
-
-# def save_mistake_if_new(mistake):
-#     """Save a mistake unless the same original/correction pair exists."""
-
-#     try:
-#         existing_mistakes = get_mistakes()
-
-#         for row in existing_mistakes:
-#             original = row[1]
-#             correction = row[2]
-
-#             if (
-#                 normalize(original)
-#                 == normalize(mistake["original_sentence"])
-#                 and normalize(correction)
-#                 == normalize(mistake["correction"])
-#             ):
-#                 print("[DEBUG] This mistake is already saved.")
-#                 return False
-
-#         save_mistake(
-#             mistake["original_sentence"],
-#             mistake["correction"],
-#             mistake["explanation"],
-#             mistake["category"],
-#         )
-
-#         print("[DEBUG] New English mistake saved.")
-#         return True
-
-#     except Exception as error:
-#         print("[DEBUG] Could not save English mistake:", error)
-#         return False
-
-
-# # ============================================================
-# # 5. PREPARE STRUCTURED MISTAKE MEMORY
-# # ============================================================
-
-# def build_mistake_memory():
-#     """Provide recent unique saved mistakes to Gemma."""
-
-#     saved_mistakes = get_mistakes()
-#     unique_mistakes = []
-#     seen_mistakes = set()
-
-#     for row in reversed(saved_mistakes):
-#         original = row[1]
-#         correction = row[2]
-
-#         key = (normalize(original), normalize(correction))
-
-#         if key in seen_mistakes:
-#             continue
-
-#         seen_mistakes.add(key)
-#         unique_mistakes.append(row)
-
-#         if len(unique_mistakes) >= 10:
-#             break
-
-#     lines = [
-#         "STRUCTURED ENGLISH MISTAKE MEMORY:",
-#         "These are database records, not invented examples.",
-#         "When asked to list saved mistakes, use only these records.",
-#         "Preserve the original sentences and corrections exactly.",
-#     ]
-
-#     for row in unique_mistakes:
-#         _, original, correction, explanation, category, _ = row
-
-#         lines.extend([
-#             f"Original: {original}",
-#             f"Correction: {correction}",
-#             f"Explanation: {explanation}",
-#             f"Category: {category}",
-#             "",
-#         ])
-
-#     if not unique_mistakes:
-#         lines.append("No structured mistakes have been saved.")
-
-#     return "\n".join(lines), len(unique_mistakes)
-
-
-# # ============================================================
-# # 6. PREPARE DUE REVIEWS
-# # ============================================================
-
-# def build_due_review_context(limit=2):
-#     """Build context for mistakes whose review dates have arrived."""
-
-#     due_mistakes = get_due_mistakes(limit=limit)
-
-#     if not due_mistakes:
-#         return "No scheduled mistake reviews are due.", []
-
-#     lines = [
-#         "SCHEDULED ENGLISH REVIEWS:",
-#         "The following database records are due for review.",
-#         "Consider reviewing one naturally during this conversation.",
-#         "Prioritize the user's current question first.",
-#         "Do not reveal the correction immediately if a short quiz",
-#         "would help the learner retrieve it from memory.",
-#     ]
-
-#     for row in due_mistakes:
-#         (
-#             mistake_id,
-#             original,
-#             correction,
-#             explanation,
-#             category,
-#             created_at,
-#             next_review_at,
-#             review_count,
-#             correct_streak,
-#             correct_count,
-#             wrong_count,
-#             last_reviewed_at,
-#             last_review_result,
-#         ) = row
-
-#         lines.extend([
-#             "",
-#             f"Review ID: {mistake_id}",
-#             f"Original: {original}",
-#             f"Correction: {correction}",
-#             f"Explanation: {explanation}",
-#             f"Category: {category}",
-#             f"Previous review attempts: {review_count}",
-#             f"Correct answers: {correct_count}",
-#             f"Incorrect answers: {wrong_count}",
-#         ])
-
-#     return "\n".join(lines), due_mistakes
-
-
-# # ============================================================
-# # 7. REVIEW-ANSWER EVALUATION
-# # ============================================================
-
-# def evaluate_review_answer(user_answer, mistake):
-#     """
-#     Ask Gemma whether the user's answer demonstrates the target rule.
-
-#     Returns True, False, or None if the result cannot be validated.
-#     """
-
-#     _, original, correction = mistake[0], mistake[1], mistake[2]
-
-#     prompt = f"""
-# You are evaluating an English learner's answer to a review exercise.
-
-# Original mistake: {original}
-# Expected correction: {correction}
-# Learner's answer: {user_answer}
-
-# Decide whether the learner's answer correctly demonstrates the
-# target correction. Accept reasonable equivalent wording if it
-# preserves the meaning and demonstrates the target rule.
-
-# Return JSON only:
-# {{"correct": true, "feedback": "Brief explanation"}}
-
-# The "correct" field must be a JSON boolean.
-# If the answer is clearly incorrect, use false.
-# """
-
-#     try:
-#         response = client.chat(
-#             model=MODEL,
-#             format="json",
-#             messages=[
-#                 {"role": "system", "content": prompt},
-#                 {
-#                     "role": "user",
-#                     "content": "Evaluate my answer using the stated rule.",
-#                 },
-#             ],
-#         )
-
-#         data = json.loads(response["message"]["content"])
-
-#         if not isinstance(data, dict):
-#             return None
-
-#         result = data.get("correct")
-
-#         if not isinstance(result, bool):
-#             return None
-
-#         return result
-
-#     except Exception as error:
-#         print("[DEBUG] Review evaluation failed:", error)
-#         return None
-
-
-# # ============================================================
-# # 8. INITIALIZE THE DATABASE
-# # ============================================================
-
-# init_db()
-
-# print("\nEnglish Tutor is ready!")
-# print("Your conversation history and saved mistakes are available.")
-# print("Phase 3 review scheduling is enabled.")
-# print("Type 'exit' to close the tutor.\n")
-
-
-# # ============================================================
-# # 9. MAIN CONVERSATION LOOP
-# # ============================================================
-
-# while True:
-#     message = input("You: ").strip()
-
-#     if message.lower() == "exit":
-#         print("Goodbye! Your conversation has been saved.")
-#         break
-
-#     if not message:
-#         continue
-
-#     try:
-#         # Save the new user message.
-#         save_message("user", message)
-
-#         # Load history, structured memory, and due reviews.
-#         history = get_chat_history(limit=30)
-#         mistake_memory, mistake_count = build_mistake_memory()
-#         review_context, due_mistakes = build_due_review_context(limit=2)
-#         stats = get_learning_stats()
-
-#         # Detect whether the user is answering an active review.
-#         active_review = None
-
-#         for row in reversed(history[:-1]):
-#             role, content = row
-
-#             if role == "assistant" and "REVIEW_ID:" in content:
-#                 try:
-#                     review_id = int(
-#                         content.split("REVIEW_ID:", 1)[1]
-#                         .split()[0]
-#                         .strip()
-#                     )
-
-#                     active_review = next(
-#                         (item for item in due_mistakes if item[0] == review_id),
-#                         None,
-#                     )
-#                 except (ValueError, IndexError):
-#                     active_review = None
-
-#                 if active_review is not None:
-#                     break
-
-#             if role == "user":
-#                 break
-
-#         # Evaluate a response only when it is clearly tied to a
-#         # review question that the tutor asked in its last turn.
-#         if active_review is not None:
-#             previous_assistant = next(
-#                 (
-#                     content
-#                     for role, content in reversed(history[:-1])
-#                     if role == "assistant"
-#                 ),
-#                 "",
-#             )
-
-#             if "REVIEW_ID:" in previous_assistant:
-#                 was_correct = evaluate_review_answer(
-#                     message, active_review
-#                 )
-
-#                 if was_correct is not None:
-#                     record_review_result(
-#                         active_review[0], was_correct
-#                     )
-
-#         # Rebuild review context after recording a result.
-#         review_context, due_mistakes = build_due_review_context(limit=2)
-#         stats = get_learning_stats()
-
-#         # Put the review ID in an internal instruction only when
-#         # a review is due. The tutor should include the ID marker
-#         # in its reply only if it actually asks the corresponding quiz.
-#         review_instruction = review_context
-
-#         if due_mistakes:
-#             review_instruction += """
-
-# If you ask the user to answer a review exercise, include the exact
-# marker REVIEW_ID: followed by that exercise's integer ID on a
-# separate final line. This marker is for the application to identify
-# which review the user's next answer belongs to.
-# Do not include this marker unless you ask a review question.
-# """
-
-#         progress_context = (
-#             "\nLEARNING STATISTICS:\n"
-#             f"Saved mistakes: {stats['total_mistakes']}\n"
-#             f"Correct review answers: {stats['correct_answers']}\n"
-#             f"Incorrect review answers: {stats['wrong_answers']}\n"
-#             f"Reviews due: {stats['due_reviews']}\n"
-#         )
-
-#         messages = [{
-#             "role": "system",
-#             "content": (
-#                 SYSTEM_PROMPT
-#                 + "\n\n"
-#                 + mistake_memory
-#                 + "\n\n"
-#                 + review_instruction
-#                 + "\n\n"
-#                 + progress_context
-#             ),
-#         }]
-
-#         # Do not duplicate the current user message: it is already
-#         # saved in history. History is passed in chronological order.
-#         for role, content in history:
-#             if role in ("user", "assistant"):
-#                 messages.append({
-#                     "role": role,
-#                     "content": content,
-#                 })
-
-#         print(
-#             f"\n[DEBUG] History messages: {len(history)} | "
-#             f"Unique mistakes: {mistake_count} | "
-#             f"Due reviews: {len(due_mistakes)}"
-#         )
-
-#         response = client.chat(
-#             model=MODEL,
-#             messages=messages,
-#         )
-
-#         answer = response["message"]["content"]
-#         print("\nTutor:", answer, "\n")
-
-#         save_message("assistant", answer)
-
-#         # Detect and save new genuine English mistakes.
-#         mistake = detect_english_mistake(message, answer)
-
-#         if mistake:
-#             save_mistake_if_new(mistake)
-
-#     except Exception as error:
-#         print("An error occurred:", error)
-#         print("Check your Ollama Cloud connection, model, and database.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import os
-# import json
-# import re
-# import sqlite3
-# from pathlib import Path
-
-# from dotenv import load_dotenv
-# from ollama import Client
-
-# from memory import (
-#     init_db,
-#     save_message,
-#     get_chat_history,
-#     save_mistake,
-#     get_mistakes,
-#     get_due_mistakes,
-#     record_review_result,
-#     get_learning_stats,
-# )
-
-
-# # ============================================================
-# # 1. CONNECT TO OLLAMA CLOUD
-# # ============================================================
-
-# load_dotenv()
-# api_key = os.getenv("OLLAMA_API_KEY")
-
-# if not api_key:
-#     raise RuntimeError("OLLAMA_API_KEY not found. Check your .env file.")
-
-# client = Client(
-#     host="https://ollama.com",
-#     headers={"Authorization": f"Bearer {api_key}"},
-#     timeout=120,
-# )
-
-# MODEL = "gemma4:31b"
-# DB_PATH = Path(__file__).parent / "learner_memory.db"
-
-
-# # ============================================================
-# # 2. PERSISTENT REVIEW STATE
-# # Keeps track of the review question across turns/restarts.
-# # This uses the existing SQLite database; memory.py is unchanged.
-# # ============================================================
-
-# def init_tutor_state():
-#     with sqlite3.connect(DB_PATH) as connection:
-#         connection.execute("""
-#             CREATE TABLE IF NOT EXISTS tutor_state (
-#                 key TEXT PRIMARY KEY,
-#                 value TEXT
-#             )
-#         """)
-#         connection.execute("""
-#             INSERT OR IGNORE INTO tutor_state (key, value)
-#             VALUES ('active_review_id', '')
-#         """)
-
-
-# def get_active_review_id():
-#     with sqlite3.connect(DB_PATH) as connection:
-#         row = connection.execute(
-#             "SELECT value FROM tutor_state WHERE key = 'active_review_id'"
-#         ).fetchone()
-
-#     if not row or not row[0]:
-#         return None
-
-#     try:
-#         return int(row[0])
-#     except (TypeError, ValueError):
-#         return None
-
-
-# def set_active_review_id(review_id):
-#     value = "" if review_id is None else str(int(review_id))
-#     with sqlite3.connect(DB_PATH) as connection:
-#         connection.execute("""
-#             INSERT INTO tutor_state (key, value)
-#             VALUES ('active_review_id', ?)
-#             ON CONFLICT(key) DO UPDATE SET value = excluded.value
-#         """, (value,))
-
-
-# # ============================================================
-# # 3. ENGLISH TUTOR INSTRUCTIONS
-# # ============================================================
-
-# SYSTEM_PROMPT = """
-# You are a friendly, patient English tutor. Your main goal is to help
-# the user improve their English while having natural, useful conversations.
-
-# For EVERY user message, follow these steps in order.
-
-# STEP 1 — CORRECT THE USER'S ENGLISH
-# - Check grammar, spelling, punctuation, and word choice.
-# - If there are mistakes, show the corrected sentence.
-# - Briefly explain important mistakes in simple English.
-# - If the sentence is already correct, say so. Do not invent mistakes.
-# - Preserve the user's original meaning.
-# - Offer a more natural expression when useful.
-
-# STEP 2 — ANSWER THE ACTUAL MESSAGE
-# - Answer the user's actual question directly.
-# - Do not let English correction replace the actual answer.
-# - Respond naturally to opinions and experiences.
-# - If the user says you missed a question, answer that question.
-# - Never invent current information or previous events.
-
-# STEP 3 — USE PREVIOUS CONVERSATION
-# - Check both user messages and assistant responses in the supplied history.
-# - When recalling a saved English mistake, use structured learner memory.
-# - Never invent a previous message, correction, or learning result.
-# - If relevant information is unavailable, say so clearly.
-# - When asked to list structured mistakes, use database records only.
-
-# STEP 4 — CONTINUE NATURALLY
-# - Ask at most one short, relevant follow-up question when useful.
-# - Do not ask a follow-up question every time.
-
-# STEP 5 — ACT AS A PERSONAL ENGLISH TEACHER
-# - Use the structured learner memory and review information supplied.
-# - Review mistakes when their scheduled review time has arrived.
-# - Answer the user's current question before introducing an unrelated review.
-# - Keep reminders brief; do not repeatedly interrupt the user.
-# - Do not claim mastery based on one correct answer.
-# - Encourage genuine progress.
-
-# STEP 6 — TEACH THROUGH PRACTICE
-# - When a saved mistake is due, a short exercise may be useful.
-# - Do not reveal the correction before the learner answers a quiz.
-# - Explain the result in simple, friendly English.
-# - Never claim that a result was recorded unless the application confirms it.
-# - Do not turn every ordinary conversation into an exercise.
-
-# STEP 7 — ADAPT TO PROGRESS
-# - Use supplied review results and statistics.
-# - Give more practice to rules the user repeatedly gets wrong.
-# - Gradually revisit rules the user answers correctly.
-# - Do not invent review dates or results.
-# - If no review is due, continue normally.
-
-# MANDATORY RESPONSE FORMAT
-
-# For every non-empty user message, use these three headings in this order:
-
-# English correction:
-# - Show the corrected sentence, or say:
-#   "Your sentence is already correct."
-
-# Why / More natural English:
-# - Explain important corrections briefly.
-# - If no correction is needed, say:
-#   "No correction is needed."
-
-# Answer:
-# - Answer the actual question or respond to the message.
-# - Keep the response concise but complete.
-
-# FORMATTING RULES
-# - Always use the three headings in the specified order.
-# - Do not invent English mistakes.
-# - Do not repeat corrections unnecessarily.
-# - Keep explanations friendly and suitable for an English learner.
-# - Preserve natural conversation and prioritize the user's question.
-# - Never display internal application IDs, markers, or debug instructions.
-# """
-
-
-# # ============================================================
-# # 4. NORMALIZATION AND DUPLICATE-SAFE MISTAKE SAVING
-# # ============================================================
-
-# def normalize(text):
-#     """Ignore case, repeated whitespace, and punctuation for comparison."""
-#     text = str(text or "").casefold()
-#     text = re.sub(r"[^\w\s']", "", text)
-#     return " ".join(text.split())
-
-
-# def save_mistake_if_new(mistake):
-#     """Save a mistake unless its normalized original/correction already exists."""
-#     try:
-#         target_original = normalize(mistake["original_sentence"])
-#         target_correction = normalize(mistake["correction"])
-
-#         if not target_original or not target_correction:
-#             return False
-
-#         for row in get_mistakes():
-#             # Existing memory rows are (id, original, correction,
-#             # explanation, category, created_at).
-#             original = row[1]
-#             correction = row[2]
-
-#             if (
-#                 normalize(original) == target_original
-#                 and normalize(correction) == target_correction
-#             ):
-#                 print("[DEBUG] This mistake is already saved.")
-#                 return False
-
-#         save_mistake(
-#             mistake["original_sentence"].strip(),
-#             mistake["correction"].strip(),
-#             mistake["explanation"].strip(),
-#             mistake["category"].strip(),
-#         )
-#         print("[DEBUG] New English mistake saved.")
-#         return True
-
-#     except Exception as error:
-#         print("[DEBUG] Could not save English mistake:", error)
-#         return False
-
-
-# # ============================================================
-# # 5. DETECT A GENUINE ENGLISH MISTAKE
-# # ============================================================
-
-# def parse_json_object(content):
-#     """Parse a JSON object, tolerating surrounding whitespace/fences."""
-#     if not isinstance(content, str) or not content.strip():
-#         return None
-
-#     content = content.strip()
-#     try:
-#         data = json.loads(content)
-#         return data if isinstance(data, dict) else None
-#     except json.JSONDecodeError:
-#         pass
-
-#     # Fallback if a model wraps the JSON in extra text.
-#     match = re.search(r"\{.*\}", content, flags=re.DOTALL)
-#     if not match:
-#         return None
-
-#     try:
-#         data = json.loads(match.group(0))
-#         return data if isinstance(data, dict) else None
-#     except json.JSONDecodeError:
-#         return None
-
-
-# def detect_english_mistake(user_text, tutor_answer):
-#     """Identify a genuine English mistake using Gemma."""
-#     extraction_prompt = """
-# You are an English mistake detector. Analyze only the user's latest
-# message for a genuine grammar, spelling, punctuation, or word-choice error.
-
-# Return one valid JSON object with exactly these fields:
-# {
-#   "has_mistake": false,
-#   "original_sentence": "",
-#   "correction": "",
-#   "explanation": "",
-#   "category": ""
-# }
-
-# If the English is correct, set has_mistake to false.
-# Do not invent mistakes. Preserve the original wording in original_sentence.
-# If a genuine mistake exists, provide a correction and short explanation.
-# Use a category such as grammar, spelling, vocabulary, punctuation, word_choice.
-# Do not treat a question about memory or the tutor as a practice sentence
-# unless it contains a genuine English error. Return JSON only.
-# """
-
-#     try:
-#         response = client.chat(
-#             model=MODEL,
-#             format="json",
-#             messages=[
-#                 {"role": "system", "content": extraction_prompt},
-#                 {
-#                     "role": "user",
-#                     "content": (
-#                         f"User's message:\n{user_text}\n\n"
-#                         f"Tutor's answer:\n{tutor_answer}"
-#                     ),
-#                 },
-#             ],
-#         )
-
-#         content = response.get("message", {}).get("content", "")
-#         data = parse_json_object(content)
-
-#         if not data or data.get("has_mistake") is not True:
-#             return None
-
-#         for field in ("original_sentence", "correction", "explanation", "category"):
-#             if not isinstance(data.get(field), str) or not data[field].strip():
-#                 return None
-
-#         return data
-
-#     except Exception as error:
-#         print("[DEBUG] Mistake detection failed:", error)
-#         return None
-
-
-# # ============================================================
-# # 6. STRUCTURED MISTAKE MEMORY AND DUE REVIEWS
-# # ============================================================
-
-# def build_mistake_memory():
-#     saved_mistakes = get_mistakes()
-#     unique_mistakes = []
-#     seen = set()
-
-#     for row in reversed(saved_mistakes):
-#         original, correction = row[1], row[2]
-#         key = (normalize(original), normalize(correction))
-
-#         if key in seen:
-#             continue
-
-#         seen.add(key)
-#         unique_mistakes.append(row)
-#         if len(unique_mistakes) >= 10:
-#             break
-
-#     lines = [
-#         "STRUCTURED ENGLISH MISTAKE MEMORY:",
-#         "These are database records, not invented examples.",
-#         "When asked to list saved mistakes, use only these records.",
-#         "Preserve original sentences and corrections exactly.",
-#     ]
-
-#     for row in unique_mistakes:
-#         _, original, correction, explanation, category, _ = row
-#         lines.extend([
-#             f"Original: {original}",
-#             f"Correction: {correction}",
-#             f"Explanation: {explanation}",
-#             f"Category: {category}",
-#             "",
-#         ])
-
-#     if not unique_mistakes:
-#         lines.append("No structured mistakes have been saved.")
-
-#     return "\n".join(lines), len(unique_mistakes)
-
-
-# # def build_due_review_context(limit=2):
-# #     due_mistakes = get_due_mistakes(limit=limit)
-
-# #     if not due_mistakes:
-# #         return "No scheduled mistake reviews are due.", []
-
-# #     lines = [
-# #         "SCHEDULED ENGLISH REVIEWS:",
-# #         "These database records are due for review.",
-# #         "Prioritize the user's current question first.",
-# #         "If appropriate, ask one short quiz about one due mistake.",
-# #         "Do not reveal the correction before the user answers.",
-# #         "Do not display internal IDs to the user.",
-# #     ]
-
-# #     for row in due_mistakes:
-# #         (
-# #             mistake_id, original, correction, explanation, category,
-# #             created_at, next_review_at, review_count, correct_streak,
-# #             correct_count, wrong_count, last_reviewed_at, last_review_result,
-# #         ) = row
-
-# #         lines.extend([
-# #             "",
-# #             f"Internal review ID: {mistake_id}",
-# #             f"Original mistake: {original}",
-# #             f"Expected correction: {correction}",
-# #             f"Explanation: {explanation}",
-# #             f"Category: {category}",
-# #             f"Previous attempts: {review_count}",
-# #             f"Correct answers: {correct_count}",
-# #             f"Incorrect answers: {wrong_count}",
-# #         ])
-
-# #     return "\n".join(lines), due_mistakes
-
-
-# def build_due_review_context(limit=2):
-#     """Select distinct due mistakes without deleting old records."""
-
-#     # Fetch due records first, then remove duplicates among those records.
-#     candidates = get_due_mistakes(limit=100)
-#     due_mistakes = []
-#     seen_mistakes = set()
-
-#     for row in candidates:
-#         mistake_id = row[0]
-#         original = normalize(row[1])
-#         correction = normalize(row[2])
-#         key = (original, correction)
-
-#         # Ignore empty entries and duplicate mistakes.
-#         if not original or not correction or key in seen_mistakes:
-#             continue
-
-#         seen_mistakes.add(key)
-#         due_mistakes.append(row)
-
-#         if len(due_mistakes) >= limit:
-#             break
-
-#     if not due_mistakes:
-#         return "No scheduled mistake reviews are due.", []
-
-#     lines = [
-#         "SCHEDULED ENGLISH REVIEWS:",
-#         "These database records are due for review.",
-#         "Prioritize the user's current question first.",
-#         "If appropriate, ask one short quiz about one due mistake.",
-#         "Do not reveal the correction before the user answers.",
-#         "Do not display internal IDs to the user.",
-#     ]
-
-#     for row in due_mistakes:
-#         (
-#             mistake_id, original, correction, explanation, category,
-#             created_at, next_review_at, review_count, correct_streak,
-#             correct_count, wrong_count, last_reviewed_at, last_review_result,
-#         ) = row
-
-#         lines.extend([
-#             "",
-#             f"Internal review ID: {mistake_id}",
-#             f"Original mistake: {original}",
-#             f"Expected correction: {correction}",
-#             f"Explanation: {explanation}",
-#             f"Category: {category}",
-#             f"Previous attempts: {review_count}",
-#             f"Correct answers: {correct_count}",
-#             f"Incorrect answers: {wrong_count}",
-#         ])
-
-#     return "\n".join(lines), due_mistakes
-
-
-# # ============================================================
-# # 7. REVIEW ANSWER EVALUATION
-# # ============================================================
-
-# def find_mistake_by_id(mistake_id):
-#     """Find a saved mistake by its database ID."""
-#     for row in get_mistakes():
-#         if row[0] == mistake_id:
-#             return row
-#     return None
-
-
-# def evaluate_review_answer(user_answer, mistake):
-#     """
-#     Return (correct, feedback), or (None, error_message) if evaluation fails.
-#     The database is updated only when a valid boolean is returned.
-#     """
-#     original = mistake[1]
-#     correction = mistake[2]
-#     explanation = mistake[3]
-
-#     prompt = f"""
-# Evaluate the learner's answer to an English review.
-
-# Saved original mistake: {original}
-# Expected correction: {correction}
-# Rule/explanation: {explanation}
-# Learner's answer: {user_answer}
-
-# Judge whether the answer correctly demonstrates the target rule.
-# Accept equivalent wording if it demonstrates the same rule and meaning.
-# Return one JSON object only, with:
-# {{"correct": true, "feedback": "Short, learner-friendly feedback"}}
-# The correct value must be a JSON boolean, not a string.
-# """
-
-#     last_error = "The model returned an empty or invalid response."
-
-#     # Retry once if the model returns empty/invalid JSON.
-#     for attempt in range(2):
-#         try:
-#             response = client.chat(
-#                 model=MODEL,
-#                 format="json",
-#                 messages=[
-#                     {"role": "system", "content": prompt},
-#                     {"role": "user", "content": "Evaluate the answer now."},
-#                 ],
-#             )
-#             content = response.get("message", {}).get("content", "")
-#             data = parse_json_object(content)
-
-#             if data and isinstance(data.get("correct"), bool):
-#                 feedback = data.get("feedback", "")
-#                 if not isinstance(feedback, str):
-#                     feedback = ""
-#                 return data["correct"], feedback.strip()
-
-#             last_error = f"Invalid evaluator response: {content[:200]!r}"
-
-#         except Exception as error:
-#             last_error = str(error)
-
-#         if attempt == 0:
-#             continue
-
-#     return None, last_error
-
-
-# # ============================================================
-# # 8. INITIALIZE
-# # ============================================================
-
-# init_db()
-# init_tutor_state()
-
-# print("\nEnglish Tutor is ready!")
-# print("Your conversation history and saved mistakes are available.")
-# print("Phase 3 review scheduling is enabled.")
-# print("Type 'exit' to close the tutor.\n")
-
-
-# # ============================================================
-# # 9. MAIN CONVERSATION LOOP
-# # ============================================================
-
-# while True:
-#     message = input("You: ").strip()
-
-#     if message.lower() == "exit":
-#         print("Goodbye! Your conversation has been saved.")
-#         break
-
-#     if not message:
-#         continue
-
-#     try:
-#         # If a previous tutor turn asked a review question, evaluate this
-#         # message against the persisted active review ID.
-#         review_feedback = ""
-#         active_review_id = get_active_review_id()
-#         preserve_active_review = False
-
-#         if active_review_id is not None:
-#             active_review = find_mistake_by_id(active_review_id)
-
-#             if active_review is None:
-#                 set_active_review_id(None)
-#                 print("[DEBUG] Active review no longer exists; cleared its ID.")
-#             else:
-#                 result, feedback = evaluate_review_answer(message, active_review)
-
-#                 if result is not None:
-#                     record_review_result(active_review_id, result)
-#                     set_active_review_id(None)
-#                     review_feedback = (
-#                         "\nRESULT OF THE JUST-ANSWERED REVIEW:\n"
-#                         f"Recorded result: {'correct' if result else 'incorrect'}.\n"
-#                         f"Evaluator feedback: {feedback or 'No extra feedback provided.'}\n"
-#                         "Acknowledge this result accurately in your response. "
-#                         "Do not claim mastery from one correct answer.\n"
-#                     )
-#                     print(
-#                         "[DEBUG] Review result recorded:",
-#                         "correct" if result else "incorrect",
-#                     )
-#                 else:
-#                     # Do not update counters when evaluation fails.
-#                     # Keep the review ID so it can be retried next turn.
-#                     preserve_active_review = True
-#                     review_feedback = (
-#                         "\nREVIEW EVALUATION STATUS:\n"
-#                         "The evaluator failed to validate the previous review "
-#                         "answer. Do not claim that it was recorded or judged "
-#                         "correct. Tell the user briefly that the review could "
-#                         "not be scored and invite them to retry the same answer.\n"
-#                     )
-#                     print("[DEBUG] Review evaluation failed:", feedback)
-
-#         save_message("user", message)
-
-#         history = get_chat_history(limit=30)
-#         mistake_memory, mistake_count = build_mistake_memory()
-#         review_context, due_mistakes = build_due_review_context(limit=2)
-#         stats = get_learning_stats()
-
-#         progress_context = (
-#             "\nLEARNING STATISTICS:\n"
-#             f"Saved mistakes: {stats['total_mistakes']}\n"
-#             f"Correct review answers: {stats['correct_answers']}\n"
-#             f"Incorrect review answers: {stats['wrong_answers']}\n"
-#             f"Reviews due: {stats['due_reviews']}\n"
-#         )
-
-#         messages = [{
-#             "role": "system",
-#             "content": (
-#                 SYSTEM_PROMPT
-#                 + "\n\n"
-#                 + mistake_memory
-#                 + "\n\n"
-#                 + review_context
-#                 + "\n\n"
-#                 + progress_context
-#                 + "\n\n"
-#                 + review_feedback
-#                 + "\n\nAPPLICATION RULE:\n"
-#                 "If you ask the user a quiz about a due saved mistake, "
-#                 "append exactly one internal marker in this form at the end "
-#                 "of your response: [[REVIEW_ID:integer]]. Replace integer "
-#                 "with that mistake's actual internal ID. Do not show any "
-#                 "other marker. The application removes this marker before "
-#                 "displaying or saving the answer. Do not include a marker "
-#                 "unless you asked a review question."
-#             ),
-#         }]
-
-#         for role, content in history:
-#             if role in ("user", "assistant"):
-#                 messages.append({"role": role, "content": content})
-
-#         print(
-#             f"\n[DEBUG] History messages: {len(history)} | "
-#             f"Unique mistakes: {mistake_count} | "
-#             f"Due reviews: {len(due_mistakes)}"
-#         )
-
-#         response = client.chat(model=MODEL, messages=messages)
-#         raw_answer = response.get("message", {}).get("content", "")
-
-#         # Extract the private review marker, then remove it from user-facing text.
-#         marker_match = re.search(
-#             r"\[\[\s*REVIEW_ID\s*:\s*(\d+)\s*\]\]",
-#             raw_answer,
-#             flags=re.IGNORECASE,
-#         )
-#         new_active_review_id = active_review_id if preserve_active_review else None
-
-#         if marker_match:
-#             candidate_id = int(marker_match.group(1))
-#             if any(row[0] == candidate_id for row in due_mistakes):
-#                 new_active_review_id = candidate_id
-#             raw_answer = re.sub(
-#                 r"\[\[\s*REVIEW_ID\s*:\s*\d+\s*\]\]",
-#                 "",
-#                 raw_answer,
-#                 flags=re.IGNORECASE,
-#             ).rstrip()
-
-#         # Persist the active review only if the model asked a matching quiz.
-#         set_active_review_id(new_active_review_id)
-
-#         answer = raw_answer.strip()
-#         print("\nTutor:", answer, "\n")
-#         save_message("assistant", answer)
-
-#         # Detect and save genuine mistakes; duplicates ignore punctuation.
-#         mistake = detect_english_mistake(message, answer)
-#         if mistake:
-#             save_mistake_if_new(mistake)
-
-#     except Exception as error:
-#         print("An error occurred:", error)
-#         print("Check your Ollama Cloud connection, model, and database.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# eli byh el fayda 
-
-# import os
-# import json
-# import re
-# import sqlite3
-# from pathlib import Path
-
-# from dotenv import load_dotenv
-# from ollama import Client
-
-# from memory import (
-#     init_db,
-#     save_message,
-#     get_chat_history,
-#     save_mistake,
-#     get_mistakes,
-#     get_due_mistakes,
-#     record_review_result,
-#     get_learning_stats,
-#     get_recurring_mistakes,
-# )
-
-
-# # ============================================================
-# # 1. CONNECT TO OLLAMA CLOUD
-# # ============================================================
-
-# load_dotenv()
-# api_key = os.getenv("OLLAMA_API_KEY")
-
-# if not api_key:
-#     raise RuntimeError("OLLAMA_API_KEY not found. Check your .env file.")
-
-# client = Client(
-#     host="https://ollama.com",
-#     headers={"Authorization": f"Bearer {api_key}"},
-#     timeout=120,
-# )
-
-# MODEL = "gemma4:31b"
-# DB_PATH = Path(__file__).parent / "learner_memory.db"
-
-
-# # ============================================================
-# # 2. PERSISTENT REVIEW STATE
-# # Keeps track of the review question across turns/restarts.
-# # This uses the existing SQLite database; memory.py is unchanged.
-# # ============================================================
-
-# def init_tutor_state():
-#     with sqlite3.connect(DB_PATH) as connection:
-#         connection.execute("""
-#             CREATE TABLE IF NOT EXISTS tutor_state (
-#                 key TEXT PRIMARY KEY,
-#                 value TEXT
-#             )
-#         """)
-#         connection.execute("""
-#             INSERT OR IGNORE INTO tutor_state (key, value)
-#             VALUES ('active_review_id', '')
-#         """)
-
-
-# def get_active_review_id():
-#     with sqlite3.connect(DB_PATH) as connection:
-#         row = connection.execute(
-#             "SELECT value FROM tutor_state WHERE key = 'active_review_id'"
-#         ).fetchone()
-
-#     if not row or not row[0]:
-#         return None
-
-#     try:
-#         return int(row[0])
-#     except (TypeError, ValueError):
-#         return None
-
-
-# def set_active_review_id(review_id):
-#     value = "" if review_id is None else str(int(review_id))
-#     with sqlite3.connect(DB_PATH) as connection:
-#         connection.execute("""
-#             INSERT INTO tutor_state (key, value)
-#             VALUES ('active_review_id', ?)
-#             ON CONFLICT(key) DO UPDATE SET value = excluded.value
-#         """, (value,))
-
-
-# # ============================================================
-# # 3. ENGLISH TUTOR INSTRUCTIONS
-# # ============================================================
-
-# SYSTEM_PROMPT = """
-# You are a friendly, patient English tutor. Your main goal is to help
-# the user improve their English while having natural, useful conversations.
-
-# For EVERY user message, follow these steps in order.
-
-# STEP 1 — CORRECT THE USER'S ENGLISH
-# - Check grammar, spelling, punctuation, and word choice.
-# - If there are mistakes, show the corrected sentence.
-# - Briefly explain important mistakes in simple English.
-# - If the sentence is already correct, say so. Do not invent mistakes.
-# - Preserve the user's original meaning.
-# - Offer a more natural expression when useful.
-
-# STEP 2 — ANSWER THE ACTUAL MESSAGE
-# - Answer the user's actual question directly.
-# - Do not let English correction replace the actual answer.
-# - Respond naturally to opinions and experiences.
-# - If the user says you missed a question, answer that question.
-# - Never invent current information or previous events.
-
-# STEP 3 — USE PREVIOUS CONVERSATION
-# - Check both user messages and assistant responses in the supplied history.
-# - When recalling a saved English mistake, use structured learner memory.
-# - Never invent a previous message, correction, or learning result.
-# - If relevant information is unavailable, say so clearly.
-# - When asked to list structured mistakes, use database records only.
-
-# STEP 4 — CONTINUE NATURALLY
-# - Ask at most one short, relevant follow-up question when useful.
-# - Do not ask a follow-up question every time.
-
-# STEP 5 — ACT AS A PERSONAL ENGLISH TEACHER
-# - Use the structured learner memory and review information supplied.
-# - The Python application manages scheduled review questions after your answer.
-# - Do not ask scheduled review questions yourself.
-# - Answer the user's current question before the application adds a review.
-# - Keep reminders brief; do not repeatedly interrupt the user.
-# - Do not claim mastery based on one correct answer.
-# - Encourage genuine progress.
-
-# STEP 6 — TEACH THROUGH PRACTICE
-# - Do not start or score scheduled reviews yourself; the application handles them.
-# - Do not reveal a due mistake's correction as part of an unsolicited quiz.
-# - Explain the result in simple, friendly English.
-# - Never claim that a result was recorded unless the application confirms it.
-# - Do not turn every ordinary conversation into an exercise.
-
-# STEP 7 — ADAPT TO PROGRESS
-# - Use supplied review results and statistics.
-# - Give more practice to rules the user repeatedly gets wrong.
-# - Gradually revisit rules the user answers correctly.
-# - Do not invent review dates or results.
-# - If no review is due, continue normally.
-
-# MANDATORY RESPONSE FORMAT
-
-# For every non-empty user message, use these three headings in this order:
-
-# English correction:
-# - Show the corrected sentence, or say:
-#   "Your sentence is already correct."
-
-# Why / More natural English:
-# - Explain important corrections briefly.
-# - If no correction is needed, say:
-#   "No correction is needed."
-
-# Answer:
-# - Answer the actual question or respond to the message.
-# - Keep the response concise but complete.
-
-# FORMATTING RULES
-# - Always use the three headings in the specified order.
-# - Do not invent English mistakes.
-# - Do not repeat corrections unnecessarily.
-# - Keep explanations friendly and suitable for an English learner.
-# - Preserve natural conversation and prioritize the user's question.
-# - Never display internal application IDs, markers, or debug instructions.
-
-# ADDITIONAL TEACHING RULES:
-
-# 1. Correct only errors that are actually present in the user's latest message.
-# 2. Always answer the user's actual message after correcting their English.
-# 3. Keep explanations short and relevant.
-# 4. During a scheduled review, evaluate the answer against the active review ID and its expected correction.
-# 5. Accept reasonable answers that preserve the target grammar.
-# 6. Do not repeat explanations unnecessarily.
-# 7. Ask at most one short follow-up question when appropriate.
-# 8. Be patient, encouraging, and natural.
-
-# """
-
-
-# # ============================================================
-# # 4. NORMALIZATION AND DUPLICATE-SAFE MISTAKE SAVING
-# # ============================================================
-
-# def normalize(text):
-#     """Ignore case, repeated whitespace, and punctuation for comparison."""
-#     text = str(text or "").casefold()
-#     text = re.sub(r"[^\w\s']", "", text)
-#     return " ".join(text.split())
-
-
-# # def save_mistake_if_new(mistake):
-# #     """Save a mistake unless its normalized original/correction already exists."""
-# #     try:
-# #         target_original = normalize(mistake["original_sentence"])
-# #         target_correction = normalize(mistake["correction"])
-
-# #         if not target_original or not target_correction:
-# #             return False
-
-# #         for row in get_mistakes():
-# #             # Existing memory rows are (id, original, correction,
-# #             # explanation, category, created_at).
-# #             original = row[1]
-# #             correction = row[2]
-
-# #             if (
-# #                 normalize(original) == target_original
-# #                 and normalize(correction) == target_correction
-# #             ):
-# #                 print("[DEBUG] This mistake is already saved.")
-# #                 return False
-
-# #         save_mistake(
-# #             mistake["original_sentence"].strip(),
-# #             mistake["correction"].strip(),
-# #             mistake["explanation"].strip(),
-# #             mistake["category"].strip(),
-# #         )
-# #         print("[DEBUG] New English mistake saved.")
-# #         return True
-
-# #     except Exception as error:
-# #         print("[DEBUG] Could not save English mistake:", error)
-# #         return False
-# # hadhi
-# # def save_mistake_if_new(mistake):
-# #     """Save every new occurrence of a detected English mistake."""
-
-# #     try:
-# #         original = mistake["original_sentence"].strip()
-# #         correction = mistake["correction"].strip()
-# #         explanation = mistake["explanation"].strip()
-# #         category = mistake["category"].strip()
-
-# #         if not normalize(original) or not normalize(correction):
-# #             return False
-
-# #         # Save every genuine occurrence, even if it happened before.
-# #         save_mistake(
-# #             original,
-# #             correction,
-# #             explanation,
-# #             category,
-# #         )
-
-# #         print("[DEBUG] English mistake occurrence saved.")
-# #         return True
-
-# #     except Exception as error:
-# #         print("[DEBUG] Could not save English mistake:", error)
-# #         return False
-
-
-# def save_mistake_if_new(mistake):
-#     """Save a mistake only if the same original/correction pair is new."""
-
-#     try:
-#         original = mistake["original_sentence"].strip()
-#         correction = mistake["correction"].strip()
-#         explanation = mistake["explanation"].strip()
-#         category = mistake["category"].strip()
-
-#         target_original = normalize(original)
-#         target_correction = normalize(correction)
-
-#         if not target_original or not target_correction:
-#             print("[DEBUG] Empty original or correction; mistake not saved.")
-#             return False
-
-#         # Check existing database records.
-#         for row in get_mistakes():
-#             # Expected row format:
-#             # (id, original, correction, explanation, category, created_at)
-#             existing_original = normalize(row[1])
-#             existing_correction = normalize(row[2])
-
-#             if (
-#                 existing_original == target_original
-#                 and existing_correction == target_correction
-#             ):
-#                 print("[DEBUG] This mistake is already saved.")
-#                 return False
-
-#         save_mistake(
-#             original,
-#             correction,
-#             explanation,
-#             category,
-#         )
-
-#         print("[DEBUG] New English mistake saved.")
-#         return True
-
-#     except Exception as error:
-#         print("[DEBUG] Could not save English mistake:", error)
-#         return False
-
-# # ============================================================
-# # 5. DETECT A GENUINE ENGLISH MISTAKE
-# # ============================================================
-
-# def parse_json_object(content):
-#     """Parse a JSON object, tolerating surrounding whitespace/fences."""
-#     if not isinstance(content, str) or not content.strip():
-#         return None
-
-#     content = content.strip()
-#     try:
-#         data = json.loads(content)
-#         return data if isinstance(data, dict) else None
-#     except json.JSONDecodeError:
-#         pass
-
-#     # Fallback if a model wraps the JSON in extra text.
-#     match = re.search(r"\{.*\}", content, flags=re.DOTALL)
-#     if not match:
-#         return None
-
-#     try:
-#         data = json.loads(match.group(0))
-#         return data if isinstance(data, dict) else None
-#     except json.JSONDecodeError:
-#         return None
-
-
-# def detect_english_mistake(user_text, tutor_answer):
-#     """Identify a genuine English mistake using Gemma."""
-#     extraction_prompt = """
-
-# You are a careful English grammar evaluator.
-
-# Analyze the user's latest message and identify genuine English
-# grammar, spelling, punctuation, or word-choice mistakes.
-
-# The tutor's answer is provided as additional context. If the tutor
-# corrected the user's sentence, carefully check whether that correction
-# identifies a genuine mistake in the user's original message.
-
-# Return exactly one valid JSON object with these fields:
-# {
-#   "has_mistake": false,
-#   "original_sentence": "",
-#   "correction": "",
-#   "explanation": "",
-#   "category": ""
-# }
-
-# Rules:
-# - Set has_mistake to true when a genuine English mistake exists.
-# - Set has_mistake to false only when no genuine mistake exists.
-# - Preserve the user's original wording in original_sentence.
-# - Provide the corrected wording, a short explanation, and a category.
-# - For example, "I am agree with you" is incorrect.
-#   Its correction is "I agree with you."
-# - Do not invent mistakes or use unrelated previous messages as errors.
-# - Analyze only the user's latest message.
-# - Return JSON only, with no Markdown or extra text.
-
-# """
-
-#     try:
-#         response = client.chat(
-#             model=MODEL,
-#             format="json",
-#             messages=[
-#                 {"role": "system", "content": extraction_prompt},
-#                 {
-#                     "role": "user",
-#                     "content": (
-#                         f"User's message:\n{user_text}\n\n"
-#                         f"Tutor's answer:\n{tutor_answer}"
-#                     ),
-#                 },
-#             ],
-#         )
-
-#         content = response.get("message", {}).get("content", "")
-#         data = parse_json_object(content)
-
-#         if not data or data.get("has_mistake") is not True:
-#             return None
-
-#         for field in ("original_sentence", "correction", "explanation", "category"):
-#             if not isinstance(data.get(field), str) or not data[field].strip():
-#                 return None
-
-#         return data
-
-#     except Exception as error:
-#         print("[DEBUG] Mistake detection failed:", error)
-#         return None
-
-
-# # ============================================================
-# # 6. STRUCTURED MISTAKE MEMORY AND DUE REVIEWS
-# # ============================================================
-
-# def build_mistake_memory():
-#     saved_mistakes = get_mistakes()
-#     unique_mistakes = []
-#     seen = set()
-
-#     for row in reversed(saved_mistakes):
-#         original, correction = row[1], row[2]
-#         key = (normalize(original), normalize(correction))
-
-#         if key in seen:
-#             continue
-
-#         seen.add(key)
-#         unique_mistakes.append(row)
-#         if len(unique_mistakes) >= 10:
-#             break
-
-#     lines = [
-#         "STRUCTURED ENGLISH MISTAKE MEMORY:",
-#         "These are database records, not invented examples.",
-#         "When asked to list saved mistakes, use only these records.",
-#         "Preserve original sentences and corrections exactly.",
-#     ]
-
-#     for row in unique_mistakes:
-#         _, original, correction, explanation, category, _ = row
-#         lines.extend([
-#             f"Original: {original}",
-#             f"Correction: {correction}",
-#             f"Explanation: {explanation}",
-#             f"Category: {category}",
-#             "",
-#         ])
-
-#     if not unique_mistakes:
-#         lines.append("No structured mistakes have been saved.")
-
-#     return "\n".join(lines), len(unique_mistakes)
-
-
-# def build_recurring_mistake_memory():
-#     """Prepare recurring mistakes for the tutor to use."""
-
-#     recurring = get_recurring_mistakes()
-
-#     lines = [
-#         "RECURRING MISTAKE ANALYSIS:",
-#         "Use these patterns to personalize English practice.",
-#         "Occurrence counts represent saved records, not guaranteed separate attempts.",
-#     ]
-
-#     if not recurring:
-#         lines.append("No recurring mistakes identified yet.")
-#     else:
-#         for item in recurring[:5]:
-#             lines.append(
-#                 f"Original: {item['original']} | "
-#                 f"Correction: {item['correction']} | "
-#                 f"Category: {item['category']} | "
-#                 f"Saved records: {item['occurrences']}"
-#             )
-
-#     return "\n".join(lines)
-
-
-# def build_due_review_context(limit=2):
-#     """Select due reviews without repeating duplicate mistakes."""
-
-#     candidates = get_due_mistakes(limit=1000)
-#     due_mistakes = []
-#     seen = set()
-
-#     for row in candidates:
-#         original = normalize(row[1])
-#         correction = normalize(row[2])
-#         key = (original, correction)
-
-#         if not original or not correction or key in seen:
-#             continue
-
-#         seen.add(key)
-#         due_mistakes.append(row)
-
-#         if len(due_mistakes) >= limit:
-#             break
-
-#     if not due_mistakes:
-#         return "No scheduled mistake reviews are due.", []
-
-#     lines = [
-#         "SCHEDULED ENGLISH REVIEWS (application-managed):",
-#         "These are unique saved mistakes due for review.",
-#         "Python selects and activates the review.",
-#         "Do not ask a review question yourself.",
-#         "Do not reveal the expected correction before the learner answers.",
-#     ]
-
-#     for row in due_mistakes:
-#         (
-#             mistake_id, original, correction, explanation, category,
-#             created_at, next_review_at, review_count, correct_streak,
-#             correct_count, wrong_count, last_reviewed_at,
-#             last_review_result,
-#         ) = row
-
-#         lines.extend([
-#             "",
-#             f"Internal review ID: {mistake_id}",
-#             f"Original mistake: {original}",
-#             f"Expected correction: {correction}",
-#             f"Explanation: {explanation}",
-#             f"Category: {category}",
-#             f"Previous attempts: {review_count}",
-#             f"Correct answers: {correct_count}",
-#             f"Incorrect answers: {wrong_count}",
-#         ])
-
-#     return "\n".join(lines), due_mistakes
-
-
-
-# # hadi2
-# # def looks_like_separate_question(message):
-# #     """Avoid grading an obvious new question as an answer to the pending quiz."""
-# #     stripped = (message or "").strip().lower()
-# #     if "?" in stripped:
-# #         return True
-# #     return bool(re.match(
-# #         r"^(what|why|when|where|who|whom|whose|which|how|can|could|would|will|do|does|did|is|are|am|was|were|have|has|had)\b",
-# #         stripped,
-# #     ))
-
-
-# def looks_like_separate_question(message):
-#     """Detect a new question that should not be scored as a review answer."""
-#     stripped = (message or "").strip().lower()
-
-#     if "?" in stripped:
-#         return True
-
-#     return bool(re.match(
-#         r"^(what|why|when|where|who|whom|whose|which|how|can|could|would|will|do|does|did|is|are|am|was|were|have|has|had)\b",
-#         stripped,
-#     ))
-
-
-# def looks_like_review_help_request(message):
-#     """Recognize requests for help instead of treating them as quiz answers."""
-#     stripped = normalize(message)
-
-#     help_patterns = [
-#         r"\bremind me\b",
-#         r"\brepeat\b",
-#         r"\bsay that again\b",
-#         r"\bwhat was the sentence\b",
-#         r"\bwhat sentence (do|did|should|must|need to)\b",
-#         r"\bwhich sentence\b",
-#         r"\bgive me a hint\b",
-#         r"\bhelp me\b",
-#         r"\bexplain (it|that|the sentence|the question)\b",
-#         r"\bi (do not|don't|dont) remember\b",
-#         r"\bi (do not|don't|dont) understand\b",
-#         r"\bcan we skip\b",
-#         r"\bcan we do this later\b",
-#     ]
-
-#     return any(re.search(pattern, stripped) for pattern in help_patterns)
-
-# # ============================================================
-# # 7. REVIEW ANSWER EVALUATION
-# # ============================================================
-
-# def find_mistake_by_id(mistake_id):
-#     """Find a saved mistake by its database ID."""
-#     for row in get_mistakes():
-#         if row[0] == mistake_id:
-#             return row
-#     return None
-
-
-# def evaluate_review_answer(user_answer, mistake):
-#     """
-#     Return (correct, feedback), or (None, error_message) if evaluation fails.
-#     The database is updated only when a valid boolean is returned.
-#     """
-#     original = mistake[1]
-#     correction = mistake[2]
-#     explanation = mistake[3]
-
-#     prompt = f"""
-# Evaluate the learner's answer to an English review.
-
-# Saved original mistake: {original}
-# Expected correction: {correction}
-# Rule/explanation: {explanation}
-# Learner's answer: {user_answer}
-
-# Judge whether the answer correctly demonstrates the target rule.
-# Accept equivalent wording if it demonstrates the same rule and meaning.
-# Return one JSON object only, with:
-# {{"correct": true, "feedback": "Short, learner-friendly feedback"}}
-# The correct value must be a JSON boolean, not a string.
-# """
-
-#     last_error = "The model returned an empty or invalid response."
-
-#     # Retry once if the model returns empty/invalid JSON.
-#     for attempt in range(2):
-#         try:
-#             response = client.chat(
-#                 model=MODEL,
-#                 format="json",
-#                 messages=[
-#                     {"role": "system", "content": prompt},
-#                     {"role": "user", "content": "Evaluate the answer now."},
-#                 ],
-#             )
-#             content = response.get("message", {}).get("content", "")
-#             data = parse_json_object(content)
-
-#             if data and isinstance(data.get("correct"), bool):
-#                 feedback = data.get("feedback", "")
-#                 if not isinstance(feedback, str):
-#                     feedback = ""
-#                 return data["correct"], feedback.strip()
-
-#             last_error = f"Invalid evaluator response: {content[:200]!r}"
-
-#         except Exception as error:
-#             last_error = str(error)
-
-#         if attempt == 0:
-#             continue
-
-#     return None, last_error
-
-
-# # ============================================================
-# # 8. INITIALIZE
-# # ============================================================
-
-# init_db()
-# init_tutor_state()
-
-# print("\nEnglish Tutor is ready!")
-# print("Your conversation history and saved mistakes are available.")
-# print("Phase 3 review scheduling is enabled (Python-managed quizzes).")
-# print("Type 'exit' to close the tutor.\n")
-
-
-# # ============================================================
-# # 9. MAIN CONVERSATION LOOP
-# # ============================================================
-
-# while True:
-#     message = input("You: ").strip()
-
-#     if message.lower() == "exit":
-#         print("Goodbye! Your conversation has been saved.")
-#         break
-
-#     if not message:
-#         continue
-
-#     try:
-#         # If a previous tutor turn asked a review question, evaluate this
-#         # message against the persisted active review ID.
-#         review_feedback = ""
-#         active_review_id = get_active_review_id()
-#         preserve_active_review = False
-#         review_was_scored = False
-#         print("[DEBUG] Active review before processing:", active_review_id)
-#         print("[DEBUG] Is this a help request:", looks_like_review_help_request(message))
-
-#         if active_review_id is not None:
-#             active_review = find_mistake_by_id(active_review_id)
-
-#             if active_review is None:
-#                 set_active_review_id(None)
-#                 active_review_id = None
-#                 print("[DEBUG] Active review no longer exists; cleared its ID.")
-#             elif (
-#                     looks_like_separate_question(message)
-#                     or looks_like_review_help_request(message)
-#             ):
-#                 # A question is likely a new request, not the user's quiz answer.
-#                 preserve_active_review = True
-#                 review_feedback = (
-#                     "\nPENDING REVIEW:\n"
-#                     "The user's latest message appears to be a separate question, "
-#                     "not an answer to the pending review. Answer their question "
-#                     "normally and briefly remind them that the review is still "
-#                     "waiting. Do not score this message.\n"
-#                 )
-#                 print("[DEBUG] Pending review preserved; latest message looks like a question.")
-#             else:
-#                 result, feedback = evaluate_review_answer(message, active_review)
-
-#                 if result is not None:
-#                     record_review_result(active_review_id, result)
-#                     set_active_review_id(None)
-#                     review_was_scored = True
-#                     # review_feedback = (
-#                     #     "\nRESULT OF THE JUST-ANSWERED REVIEW:\n"
-#                     #     f"Recorded result: {'correct' if result else 'incorrect'}.\n"
-#                     #     f"Evaluator feedback: {feedback or 'No extra feedback provided.'}\n"
-#                     #     "Acknowledge this result accurately in your response. "
-#                     #     "Do not claim mastery from one correct answer.\n"
-#                     # )
-#                     review_feedback = (
-#                         "\nPENDING REVIEW:\n"
-#                         "The user is asking for help with the pending review, "
-#                         "not answering it. Do not score this message.\n"
-#                         f"The exact sentence waiting for correction is: "
-#                         f"'{active_review[1]}'\n"
-#                         "When the user asks to be reminded, repeat that exact sentence. "
-#                         "Do not guess a sentence from conversation history. "
-#                         "Keep the same review active until the user answers it.\n"
-#                     )
-#                     print(
-#                         "[DEBUG] Review result recorded:",
-#                         "correct" if result else "incorrect",
-#                     )
-#                 else:
-#                     # Do not update counters when evaluation fails.
-#                     # Keep the review ID so it can be retried next turn.
-#                     preserve_active_review = True
-#                     review_feedback = (
-#                         "\nREVIEW EVALUATION STATUS:\n"
-#                         "The evaluator failed to validate the previous review "
-#                         "answer. Do not claim that it was recorded or judged "
-#                         "correct. Tell the user briefly that the review could "
-#                         "not be scored and invite them to retry the same answer.\n"
-#                     )
-#                     print("[DEBUG] Review evaluation failed:", feedback)
-
-#         save_message("user", message)
-
-#         history = get_chat_history(limit=30)
-#         mistake_memory, mistake_count = build_mistake_memory()
-#         recurring_memory = build_recurring_mistake_memory()
-#         review_context, due_mistakes = build_due_review_context(limit=2)
-#         stats = get_learning_stats()
-
-#         progress_context = (
-#             "\nLEARNING STATISTICS:\n"
-#             f"Saved mistakes: {stats['total_mistakes']}\n"
-#             f"Correct review answers: {stats['correct_answers']}\n"
-#             f"Incorrect review answers: {stats['wrong_answers']}\n"
-#             f"Reviews due: {stats['due_reviews']}\n"
-#         )
-
-#         messages = [{
-#             "role": "system",
-#             "content": (
-#                 SYSTEM_PROMPT
-#                 + "\n\n"
-#                 + mistake_memory
-#                 + "\n\n"
-#                 + recurring_memory
-#                 + "\n\n"
-#                 + review_context
-#                 + "\n\n"
-#                 + progress_context
-#                 + "\n\n"
-#                 + review_feedback
-#                 + "\n\nAPPLICATION RULE:\n"
-#                 "Do not generate review markers or start a scheduled quiz. "
-#                 "Python will select a due mistake and append the review question "
-#                 "after your answer when appropriate. Never claim a review was "
-#                 "scored unless the application explicitly provides that result."
-#             ),
-#         }]
-# # hadi bdlnaha
-#         # for role, content in history:
-#         #     if role in ("user", "assistant"):
-#         #         messages.append({"role": role, "content": content})
-        
-# # Send only the 10 most recent conversation messages.
-# # Keep the system prompt and structured learner memory above.
-#         for role, content in history[-10:]:
-#             if role in ("user", "assistant"):
-#                 messages.append({"role": role, "content": content})
-
-
-#         # print(
-#         #     f"\n[DEBUG] History messages: {len(history)} | "
-#         #     f"Unique mistakes: {mistake_count} | "
-#         #     f"Due reviews: {len(due_mistakes)}"
-#         # )
-        
-#         print(
-#               f"\n[DEBUG] Recent history messages: {len(history[-10:])} | "
-#               f"Unique mistakes: {mistake_count} | "
-#               f"Due reviews: {len(due_mistakes)}"
-#         )
-#         if (
-#                     active_review_id is not None
-#                 and looks_like_review_help_request(message)
-#         ):
-#            print("\nTutor: The sentence you need to correct is:")
-#            print(f"\n“{active_review[1]}”\n")
-#            save_message(
-#            "assistant",
-#           f"The sentence you need to correct is: “{active_review[1]}”"
-#          )
-#            continue
-
-#         response = client.chat(model=MODEL, messages=messages)
-#         raw_answer = response.get("message", {}).get("content", "")
-
-#         # Python owns review selection and activation; no LLM marker is needed.
-#         if preserve_active_review:
-#             next_active_review_id = active_review_id
-#         else:
-#             next_active_review_id = None
-
-#         # If a review was just scored, let the learner see the feedback first.
-#         # Otherwise, ask one due review after answering the user's current message.
-#         if (
-#             next_active_review_id is None
-#             and not review_was_scored
-#             and not preserve_active_review
-#             and due_mistakes
-#         ):
-#             selected_review = due_mistakes[0]
-#             next_active_review_id = selected_review[0]
-#             review_question = (
-#                 "\n\nQuick review: How would you correct this sentence?\n"
-#                 f'“{selected_review[1]}”'
-#             )
-#             raw_answer = raw_answer.rstrip() + review_question
-#             print("[DEBUG] Python selected due review ID:", next_active_review_id)
-
-#         set_active_review_id(next_active_review_id)
-#         print("[DEBUG] Active review ID:", get_active_review_id())
-
-#         answer = raw_answer.strip()
-#         print("\nTutor:", answer, "\n")
-#         save_message("assistant", answer)
-
-#         # Detect and save genuine mistakes; duplicates ignore punctuation.
-#         # mistake = detect_english_mistake(message, answer)
-#         # if mistake:
-#         #     save_mistake_if_new(mistake)
-
-         
-#         mistake = detect_english_mistake(message, answer)
-
-#         print("[DEBUG] Mistake detector result:", mistake)
-
-#         if mistake:
-#                 save_mistake_if_new(mistake)
-#         else:
-#                 print("[DEBUG] No mistake was returned by the detector.")
-                      
-#     except Exception as error:
-#         print("An error occurred:", error)
-#         print("Check your Ollama Cloud connection, model, and database.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# hadha 
-# import os
-# import json
-# import re
-# import sqlite3
-# from pathlib import Path
-
-# from dotenv import load_dotenv
-# from ollama import Client
-
-# from memory import (
-#     init_db,
-#     save_message,
-#     get_chat_history,
-#     save_mistake,
-#     get_mistakes,
-#     get_due_mistakes,
-#     record_review_result,
-#     get_learning_stats,
-#     get_recurring_mistakes,  # Added for Phase 3 personalization
-# )
-
-
-# # ============================================================
-# # 1. CONNECT TO OLLAMA CLOUD
-# # ============================================================
-
-# load_dotenv()
-# api_key = os.getenv("OLLAMA_API_KEY")
-
-# if not api_key:
-#     raise RuntimeError("OLLAMA_API_KEY not found. Check your .env file.")
-
-# client = Client(
-#     host="https://ollama.com",
-#     headers={"Authorization": f"Bearer {api_key}"},
-#     timeout=120,
-# )
-
-# MODEL = "gemma4:31b"
-# DB_PATH = Path(__file__).parent / "learner_memory.db"
-
-
-# # ============================================================
-# # 2. PERSISTENT REVIEW STATE
-# # Keeps track of the review question across turns/restarts.
-# # This uses the existing SQLite database; memory.py is unchanged.
-# # ============================================================
-
-# def init_tutor_state():
-#     with sqlite3.connect(DB_PATH) as connection:
-#         connection.execute("""
-#             CREATE TABLE IF NOT EXISTS tutor_state (
-#                 key TEXT PRIMARY KEY,
-#                 value TEXT
-#             )
-#         """)
-#         connection.execute("""
-#             INSERT OR IGNORE INTO tutor_state (key, value)
-#             VALUES ('active_review_id', '')
-#         """)
-
-
-# def get_active_review_id():
-#     with sqlite3.connect(DB_PATH) as connection:
-#         row = connection.execute(
-#             "SELECT value FROM tutor_state WHERE key = 'active_review_id'"
-#         ).fetchone()
-
-#     if not row or not row[0]:
-#         return None
-
-#     try:
-#         return int(row[0])
-#     except (TypeError, ValueError):
-#         return None
-
-
-# def set_active_review_id(review_id):
-#     value = "" if review_id is None else str(int(review_id))
-#     with sqlite3.connect(DB_PATH) as connection:
-#         connection.execute("""
-#             INSERT INTO tutor_state (key, value)
-#             VALUES ('active_review_id', ?)
-#             ON CONFLICT(key) DO UPDATE SET value = excluded.value
-#         """, (value,))
-
-
-# # ============================================================
-# # 3. ENGLISH TUTOR INSTRUCTIONS
-# # ============================================================
-
-# SYSTEM_PROMPT = """
-# You are a friendly, patient English tutor. Your main goal is to help
-# the user improve their English while having natural, useful conversations.
-
-# For EVERY user message, follow these steps in order.
-
-# STEP 1 — CORRECT THE USER'S ENGLISH
-# - Check grammar, spelling, punctuation, and word choice.
-# - If there are mistakes, show the corrected sentence.
-# - Briefly explain important mistakes in simple English.
-# - If the sentence is already correct, say so. Do not invent mistakes.
-# - Preserve the user's original meaning.
-# - Offer a more natural expression when useful.
-
-# STEP 2 — ANSWER THE ACTUAL MESSAGE
-# - Answer the user's actual question directly.
-# - Do not let English correction replace the actual answer.
-# - Respond naturally to opinions and experiences.
-# - If the user says you missed a question, answer that question.
-# - Never invent current information or previous events.
-
-# STEP 3 — USE PREVIOUS CONVERSATION
-# - Check both user messages and assistant responses in the supplied history.
-# - When recalling a saved English mistake, use structured learner memory.
-# - Never invent a previous message, correction, or learning result.
-# - If relevant information is unavailable, say so clearly.
-# - When asked to list structured mistakes, use database records only.
-
-# STEP 4 — CONTINUE NATURALLY
-# - Ask at most one short, relevant follow-up question when useful.
-# - Do not ask a follow-up question every time.
-
-# STEP 5 — ACT AS A PERSONAL ENGLISH TEACHER
-# - Use the structured learner memory and review information supplied.
-# - The Python application manages scheduled review questions after your answer.
-# - Do not ask scheduled review questions yourself.
-# - Answer the user's current question before the application adds a review.
-# - Keep reminders brief; do not repeatedly interrupt the user.
-# - Do not claim mastery based on one correct answer.
-# - Encourage genuine progress.
-
-# STEP 6 — TEACH THROUGH PRACTICE
-# - Do not start or score scheduled reviews yourself; the application handles them.
-# - Do not reveal a due mistake's correction as part of an unsolicited quiz.
-# - Explain the result in simple, friendly English.
-# - Never claim that a result was recorded unless the application confirms it.
-# - Do not turn every ordinary conversation into an exercise.
-
-# STEP 7 — ADAPT TO PROGRESS
-# - Use supplied review results and statistics.
-# - Give more practice to rules the user repeatedly gets wrong.
-# - Gradually revisit rules the user answers correctly.
-# - Do not invent review dates or results.
-# - If no review is due, continue normally.
-
-# MANDATORY RESPONSE FORMAT
-
-# For every non-empty user message, use these three headings in this order:
-
-# English correction:
-# - Show the corrected sentence, or say:
-#   "Your sentence is already correct."
-
-# Why / More natural English:
-# - Explain important corrections briefly.
-# - If no correction is needed, say:
-#   "No correction is needed."
-
-# Answer:
-# - Answer the actual question or respond to the message.
-# - Keep the response concise but complete.
-
-# FORMATTING RULES
-# - Always use the three headings in the specified order.
-# - Do not invent English mistakes.
-# - Do not repeat corrections unnecessarily.
-# - Keep explanations friendly and suitable for an English learner.
-# - Preserve natural conversation and prioritize the user's question.
-# - Never display internal application IDs, markers, or debug instructions.
-# """
-
-
-# # ============================================================
-# # 4. NORMALIZATION AND DUPLICATE-SAFE MISTAKE SAVING
-# # ============================================================
-
-# def normalize(text):
-#     """Ignore case, repeated whitespace, and punctuation for comparison."""
-#     text = str(text or "").casefold()
-#     text = re.sub(r"[^\w\s']", "", text)
-#     return " ".join(text.split())
-
-
-# def save_mistake_if_new(mistake):
-#     """Save a mistake unless its normalized original/correction already exists."""
-#     try:
-#         target_original = normalize(mistake["original_sentence"])
-#         target_correction = normalize(mistake["correction"])
-
-#         if not target_original or not target_correction:
-#             return False
-
-#         for row in get_mistakes():
-#             # Existing memory rows are (id, original, correction,
-#             # explanation, category, created_at).
-#             original = row[1]
-#             correction = row[2]
-
-#             if (
-#                 normalize(original) == target_original
-#                 and normalize(correction) == target_correction
-#             ):
-#                 print("[DEBUG] This mistake is already saved.")
-#                 return False
-
-#         save_mistake(
-#             mistake["original_sentence"].strip(),
-#             mistake["correction"].strip(),
-#             mistake["explanation"].strip(),
-#             mistake["category"].strip(),
-#         )
-#         print("[DEBUG] New English mistake saved.")
-#         return True
-
-#     except Exception as error:
-#         print("[DEBUG] Could not save English mistake:", error)
-#         return False
-
-
-# # ============================================================
-# # 5. DETECT A GENUINE ENGLISH MISTAKE
-# # ============================================================
-
-# def parse_json_object(content):
-#     """Parse a JSON object, tolerating surrounding whitespace/fences."""
-#     if not isinstance(content, str) or not content.strip():
-#         return None
-
-#     content = content.strip()
-#     try:
-#         data = json.loads(content)
-#         return data if isinstance(data, dict) else None
-#     except json.JSONDecodeError:
-#         pass
-
-#     # Fallback if a model wraps the JSON in extra text.
-#     match = re.search(r"\{.*\}", content, flags=re.DOTALL)
-#     if not match:
-#         return None
-
-#     try:
-#         data = json.loads(match.group(0))
-#         return data if isinstance(data, dict) else None
-#     except json.JSONDecodeError:
-#         return None
-
-
-# def detect_english_mistake(user_text, tutor_answer):
-#     """Identify a genuine English mistake using Gemma."""
-#     extraction_prompt = """
-# You are an English mistake detector. Analyze only the user's latest
-# message for a genuine grammar, spelling, punctuation, or word-choice error.
-
-# Return one valid JSON object with exactly these fields:
-# {
-#   "has_mistake": false,
-#   "original_sentence": "",
-#   "correction": "",
-#   "explanation": "",
-#   "category": ""
-# }
-
-# If the English is correct, set has_mistake to false.
-# Do not invent mistakes. Preserve the original wording in original_sentence.
-# If a genuine mistake exists, provide a correction and short explanation.
-# Use a category such as grammar, spelling, vocabulary, punctuation, word_choice.
-# Do not treat a question about memory or the tutor as a practice sentence
-# unless it contains a genuine English error. Return JSON only.
-# """
-
-#     try:
-#         response = client.chat(
-#             model=MODEL,
-#             format="json",
-#             messages=[
-#                 {"role": "system", "content": extraction_prompt},
-#                 {
-#                     "role": "user",
-#                     "content": (
-#                         f"User's message:\n{user_text}\n\n"
-#                         f"Tutor's answer:\n{tutor_answer}"
-#                     ),
-#                 },
-#             ],
-#         )
-
-#         content = response.get("message", {}).get("content", "")
-#         data = parse_json_object(content)
-
-#         if not data or data.get("has_mistake") is not True:
-#             return None
-
-#         for field in ("original_sentence", "correction", "explanation", "category"):
-#             if not isinstance(data.get(field), str) or not data[field].strip():
-#                 return None
-
-#         return data
-
-#     except Exception as error:
-#         print("[DEBUG] Mistake detection failed:", error)
-#         return None
-
-
-# # ============================================================
-# # 6. STRUCTURED MISTAKE MEMORY AND DUE REVIEWS
-# # ============================================================
-
-# def build_mistake_memory():
-#     saved_mistakes = get_mistakes()
-#     unique_mistakes = []
-#     seen = set()
-
-#     for row in reversed(saved_mistakes):
-#         original, correction = row[1], row[2]
-#         key = (normalize(original), normalize(correction))
-
-#         if key in seen:
-#             continue
-
-#         seen.add(key)
-#         unique_mistakes.append(row)
-#         if len(unique_mistakes) >= 10:
-#             break
-
-#     lines = [
-#         "STRUCTURED ENGLISH MISTAKE MEMORY:",
-#         "These are database records, not invented examples.",
-#         "When asked to list saved mistakes, use only these records.",
-#         "Preserve original sentences and corrections exactly.",
-#     ]
-
-#     for row in unique_mistakes:
-#         _, original, correction, explanation, category, _ = row
-#         lines.extend([
-#             f"Original: {original}",
-#             f"Correction: {correction}",
-#             f"Explanation: {explanation}",
-#             f"Category: {category}",
-#             "",
-#         ])
-
-#     if not unique_mistakes:
-#         lines.append("No structured mistakes have been saved.")
-
-#     return "\n".join(lines), len(unique_mistakes)
-
-
-# def build_recurring_mistake_memory():
-#     """Prepare recurring mistakes for personalized English practice."""
-#     recurring = get_recurring_mistakes()
-#     lines = [
-#         "RECURRING MISTAKE ANALYSIS:",
-#         "Use these patterns to personalize explanations and practice.",
-#         "Occurrence counts are saved database records, not guaranteed separate attempts.",
-#     ]
-
-#     if not recurring:
-#         lines.append("No recurring mistakes identified yet.")
-#     else:
-#         for item in recurring[:5]:
-#             lines.append(
-#                 f"Original: {item['original']} | "
-#                 f"Correction: {item['correction']} | "
-#                 f"Category: {item['category']} | "
-#                 f"Saved records: {item['occurrences']}"
-#             )
-
-#     return "\n".join(lines)
-
-
-# def build_due_review_context(limit=2):
-#     """Return distinct due mistakes; Python itself will ask the review question."""
-#     # Original candidate limit preserved: candidates = get_due_mistakes(limit=100)
-#     candidates = get_due_mistakes(limit=1000)  # Added: find unique due reviews
-#     due_mistakes = []
-#     seen = set()
-
-#     for row in candidates:
-#         key = (normalize(row[1]), normalize(row[2]))
-#         if not key[0] or not key[1] or key in seen:
-#             continue
-#         seen.add(key)
-#         due_mistakes.append(row)
-#         if len(due_mistakes) >= limit:
-#             break
-
-#     if not due_mistakes:
-#         return "No scheduled mistake reviews are due.", []
-
-#     lines = [
-#         "SCHEDULED ENGLISH REVIEWS (application-managed):",
-#         "These saved mistakes are due for review.",
-#         "Do not ask a review question yourself; Python will append one after your answer.",
-#         "Do not mention these review records unless the user asks about learning history.",
-#         "Never claim a review was completed or scored unless application feedback says so.",
-#     ]
-
-#     for row in due_mistakes:
-#         (
-#             mistake_id, original, correction, explanation, category,
-#             created_at, next_review_at, review_count, correct_streak,
-#             correct_count, wrong_count, last_reviewed_at, last_review_result,
-#         ) = row
-#         lines.extend([
-#             "",
-#             f"Internal review ID: {mistake_id}",
-#             f"Original mistake: {original}",
-#             f"Expected correction: {correction}",
-#             f"Explanation: {explanation}",
-#             f"Category: {category}",
-#             f"Previous attempts: {review_count}",
-#             f"Correct answers: {correct_count}",
-#             f"Incorrect answers: {wrong_count}",
-#         ])
-
-#     return "\n".join(lines), due_mistakes
-
-
-# def looks_like_separate_question(message):
-#     """Avoid grading an obvious new question as an answer to the pending quiz."""
-#     stripped = (message or "").strip().lower()
-#     if "?" in stripped:
-#         return True
-#     return bool(re.match(
-#         r"^(what|why|when|where|who|whom|whose|which|how|can|could|would|will|do|does|did|is|are|am|was|were|have|has|had)\b",
-#         stripped,
-#     ))
-
-
-# # PHASE3_STEP5_EXPANDED_HELP_DETECTION
-# # Added definition; the original help detector above remains unchanged.
-# def looks_like_review_help_request(message):
-#     """Recognize help requests rather than scoring them as review answers."""
-#     stripped = normalize(message)
-#     help_patterns = [
-#         r"\bremind me\b",
-#         r"\brepeat\b",
-#         r"\bsay that again\b",
-#         r"\bwhat was the sentence\b",
-#         r"\bwhat sentence (do|did|should|must|need to)\b",
-#         r"\bwhich sentence\b",
-#         r"\bgive me a hint\b",
-#         r"\bhelp me\b",
-#         r"\bexplain (it|that|the sentence|the question)\b",
-#         r"\bi (do not|don't|dont) remember\b",
-#         r"\bi (do not|don't|dont) understand\b",
-#         r"\bcan we skip\b",
-#         r"\bcan we do this later\b",
-#         r"\bwhat do i need to correct\b",
-#         r"\btell me (the )?(sentence|question)\b",
-#     ]
-#     return any(re.search(pattern, stripped) for pattern in help_patterns)
-
-
-# # ============================================================
-# # 7. REVIEW ANSWER EVALUATION
-# # ============================================================
-
-# def find_mistake_by_id(mistake_id):
-#     """Find a saved mistake by its database ID."""
-#     for row in get_mistakes():
-#         if row[0] == mistake_id:
-#             return row
-#     return None
-
-
-# def evaluate_review_answer(user_answer, mistake):
-#     """
-#     Return (correct, feedback), or (None, error_message) if evaluation fails.
-#     The database is updated only when a valid boolean is returned.
-#     """
-#     original = mistake[1]
-#     correction = mistake[2]
-#     explanation = mistake[3]
-
-#     prompt = f"""
-# Evaluate the learner's answer to an English review.
-
-# Saved original mistake: {original}
-# Expected correction: {correction}
-# Rule/explanation: {explanation}
-# Learner's answer: {user_answer}
-
-# Judge whether the answer correctly demonstrates the target rule.
-# Accept equivalent wording if it demonstrates the same rule and meaning.
-# Return one JSON object only, with:
-# {{"correct": true, "feedback": "Short, learner-friendly feedback"}}
-# The correct value must be a JSON boolean, not a string.
-# """
-
-#     last_error = "The model returned an empty or invalid response."
-
-#     # Retry once if the model returns empty/invalid JSON.
-#     for attempt in range(2):
-#         try:
-#             response = client.chat(
-#                 model=MODEL,
-#                 format="json",
-#                 messages=[
-#                     {"role": "system", "content": prompt},
-#                     {"role": "user", "content": "Evaluate the answer now."},
-#                 ],
-#             )
-#             content = response.get("message", {}).get("content", "")
-#             data = parse_json_object(content)
-
-#             if data and isinstance(data.get("correct"), bool):
-#                 feedback = data.get("feedback", "")
-#                 if not isinstance(feedback, str):
-#                     feedback = ""
-#                 return data["correct"], feedback.strip()
-
-#             last_error = f"Invalid evaluator response: {content[:200]!r}"
-
-#         except Exception as error:
-#             last_error = str(error)
-
-#         if attempt == 0:
-#             continue
-
-#     return None, last_error
-
-
-# # ============================================================
-# # 8. INITIALIZE
-# # ============================================================
-
-# init_db()
-# init_tutor_state()
-
-# print("\nEnglish Tutor is ready!")
-# print("Your conversation history and saved mistakes are available.")
-# print("Phase 3 review scheduling is enabled (Python-managed quizzes).")
-# print("Type 'exit' to close the tutor.\n")
-
-
-# # ============================================================
-# # 9. MAIN CONVERSATION LOOP
-# # ============================================================
-
-# while True:
-#     message = input("You: ").strip()
-
-#     if message.lower() == "exit":
-#         print("Goodbye! Your conversation has been saved.")
-#         break
-
-#     if not message:
-#         continue
-
-#     try:
-#         # If a previous tutor turn asked a review question, evaluate this
-#         # message against the persisted active review ID.
-#         review_feedback = ""
-#         active_review_id = get_active_review_id()
-#         preserve_active_review = False
-#         review_was_scored = False
-#         review_help_requested = False
-
-#         if active_review_id is not None:
-#             active_review = find_mistake_by_id(active_review_id)
-
-#             if active_review is None:
-#                 set_active_review_id(None)
-#                 active_review_id = None
-#                 print("[DEBUG] Active review no longer exists; cleared its ID.")
-#             elif looks_like_separate_question(message):
-#                 # A question is likely a new request, not the user's quiz answer.
-#                 preserve_active_review = True
-#                 review_feedback = (
-#                     "\nPENDING REVIEW:\n"
-#                     "The user's latest message appears to be a separate question, "
-#                     "not an answer to the pending review. Answer their question "
-#                     "normally and briefly remind them that the review is still "
-#                     "waiting. Do not score this message.\n"
-#                 )
-#                 print("[DEBUG] Pending review preserved; latest message looks like a question.")
-#             else:
-#                 result, feedback = evaluate_review_answer(message, active_review)
-
-#                 if result is not None:
-#                     record_review_result(active_review_id, result)
-#                     set_active_review_id(None)
-#                     review_was_scored = True
-#                     review_feedback = (
-#                         "\nRESULT OF THE JUST-ANSWERED REVIEW:\n"
-#                         f"Recorded result: {'correct' if result else 'incorrect'}.\n"
-#                         f"Evaluator feedback: {feedback or 'No extra feedback provided.'}\n"
-#                         "Acknowledge this result accurately in your response. "
-#                         "Do not claim mastery from one correct answer.\n"
-#                     )
-#                     print(
-#                         "[DEBUG] Review result recorded:",
-#                         "correct" if result else "incorrect",
-#                     )
-#                 else:
-#                     # Do not update counters when evaluation fails.
-#                     # Keep the review ID so it can be retried next turn.
-#                     preserve_active_review = True
-#                     review_feedback = (
-#                         "\nREVIEW EVALUATION STATUS:\n"
-#                         "The evaluator failed to validate the previous review "
-#                         "answer. Do not claim that it was recorded or judged "
-#                         "correct. Tell the user briefly that the review could "
-#                         "not be scored and invite them to retry the same answer.\n"
-#                     )
-#                     print("[DEBUG] Review evaluation failed:", feedback)
-
-#         save_message("user", message)
-
-#         history = get_chat_history(limit=30)
-#         mistake_memory, mistake_count = build_mistake_memory()
-#         recurring_memory = build_recurring_mistake_memory()  # Added for Phase 3
-#         review_context, due_mistakes = build_due_review_context(limit=2)
-#         stats = get_learning_stats()
-
-#         progress_context = (
-#             "\nLEARNING STATISTICS:\n"
-#             f"Saved mistakes: {stats['total_mistakes']}\n"
-#             f"Correct review answers: {stats['correct_answers']}\n"
-#             f"Incorrect review answers: {stats['wrong_answers']}\n"
-#             f"Reviews due: {stats['due_reviews']}\n"
-#         )
-
-#         messages = [{
-#             "role": "system",
-#             "content": (
-#                 SYSTEM_PROMPT
-#                 + "\n\n"
-#                 + mistake_memory
-#                 + "\n\n"
-#                 + recurring_memory
-#                 + "\n\n"
-#                 + review_context
-#                 + "\n\n"
-#                 + progress_context
-#                 + "\n\n"
-#                 + review_feedback
-#                 + "\n\nAPPLICATION RULE:\n"
-#                 "Do not generate review markers or start a scheduled quiz. "
-#                 "Python will select a due mistake and append the review question "
-#                 "after your answer when appropriate. Never claim a review was "
-#                 "scored unless the application explicitly provides that result."
-#             ),
-#         }]
-
-#         # Original history loop preserved: for role, content in history:
-#         for role, content in history[-10:]:
-#             if role in ("user", "assistant"):
-#                 messages.append({"role": role, "content": content})
-
-#         print(
-#             f"\n[DEBUG] History messages: {len(history)} | "
-#             f"Unique mistakes: {mistake_count} | "
-#             f"Due reviews: {len(due_mistakes)}"
-#         )
-
-#         response = client.chat(model=MODEL, messages=messages)
-#         raw_answer = response.get("message", {}).get("content", "")
-
-#         # Python owns review selection and activation; no LLM marker is needed.
-#         if preserve_active_review:
-#             next_active_review_id = active_review_id
-#         else:
-#             next_active_review_id = None
-
-#         # If a review was just scored, let the learner see the feedback first.
-#         # Otherwise, ask one due review after answering the user's current message.
-#         if (
-#             next_active_review_id is None
-#             and not review_was_scored
-#             and due_mistakes
-#         ):
-#             selected_review = due_mistakes[0]
-#             next_active_review_id = selected_review[0]
-#             review_question = (
-#                 "\n\nQuick review: How would you correct this sentence?\n"
-#                 f'“{selected_review[1]}”'
-#             )
-#             raw_answer = raw_answer.rstrip() + review_question
-#             print("[DEBUG] Python selected due review ID:", next_active_review_id)
-
-#         set_active_review_id(next_active_review_id)
-#         print("[DEBUG] Active review ID:", get_active_review_id())
-
-#         answer = raw_answer.strip()
-#         print("\nTutor:", answer, "\n")
-#         save_message("assistant", answer)
-
-#         # Detect and save genuine mistakes; duplicates ignore punctuation.
-
-#         mistake = detect_english_mistake(message, answer)
-#         if mistake:
-#             save_mistake_if_new(mistake)
-
-#     except Exception as error:
-#         print("An error occurred:", error)
-#         print("Check your Ollama Cloud connection, model, and database.")
-
-
-
-
-
-
 
 
 
@@ -5006,8 +53,6 @@ DB_PATH = Path(__file__).parent / "learner_memory.db"
 
 # ============================================================
 # 2. PERSISTENT REVIEW STATE
-# Keeps track of the review question across turns/restarts.
-# This uses the existing SQLite database; memory.py is unchanged.
 # ============================================================
 
 def init_tutor_state():
@@ -5022,35 +67,114 @@ def init_tutor_state():
             INSERT OR IGNORE INTO tutor_state (key, value)
             VALUES ('active_review_id', '')
         """)
+        connection.execute("""
+            INSERT OR IGNORE INTO tutor_state (key, value)
+            VALUES ('review_session_active', '0')
+        """)
+
+
+def get_state_value(key, default=""):
+    with sqlite3.connect(DB_PATH) as connection:
+        row = connection.execute(
+            "SELECT value FROM tutor_state WHERE key = ?", (key,)
+        ).fetchone()
+    return row[0] if row else default
+
+
+def set_state_value(key, value):
+    with sqlite3.connect(DB_PATH) as connection:
+        connection.execute("""
+            INSERT INTO tutor_state (key, value)
+            VALUES (?, ?)
+            ON CONFLICT(key) DO UPDATE SET value = excluded.value
+        """, (key, str(value)))
 
 
 def get_active_review_id():
-    with sqlite3.connect(DB_PATH) as connection:
-        row = connection.execute(
-            "SELECT value FROM tutor_state WHERE key = 'active_review_id'"
-        ).fetchone()
-
-    if not row or not row[0]:
+    value = get_state_value("active_review_id", "")
+    if not value:
         return None
-
     try:
-        return int(row[0])
+        return int(value)
     except (TypeError, ValueError):
         return None
 
 
 def set_active_review_id(review_id):
     value = "" if review_id is None else str(int(review_id))
-    with sqlite3.connect(DB_PATH) as connection:
-        connection.execute("""
-            INSERT INTO tutor_state (key, value)
-            VALUES ('active_review_id', ?)
-            ON CONFLICT(key) DO UPDATE SET value = excluded.value
-        """, (value,))
+    set_state_value("active_review_id", value)
+
+
+def is_review_session_active():
+    return get_state_value("review_session_active", "0") == "1"
+
+
+def set_review_session_active(active):
+    set_state_value("review_session_active", "1" if active else "0")
 
 
 # ============================================================
-# 3. ENGLISH TUTOR INSTRUCTIONS
+# 3. REVIEW SESSION INTENT
+# Reviews start only when the learner asks. A pending review is
+# preserved when paused and resumes when the learner asks again.
+# ============================================================
+
+# def wants_to_start_reviews(message):
+#     text = normalize(message)
+#     patterns = [
+#         r"\b(start|begin|resume|continue)\s+(my\s+)?(english\s+)?reviews?\b",
+#         r"\b(let us|let's)\s+(start|do|continue|resume)\s+(the\s+)?reviews?\b",
+#         r"\b(can we|could we)\s+(start|do|continue|resume)\s+(the\s+)?reviews?\b",
+#         r"\bi want to (start|do|continue|resume)\s+(my\s+)?reviews?\b",
+#         r"\bquiz me on my mistakes\b",
+#         r"\bpractice my saved mistakes\b",
+#     ]
+#     return any(re.search(pattern, text) for pattern in patterns)
+
+def wants_to_start_reviews(message):
+    text = normalize(message).strip()
+
+    patterns = [
+        # Explicit review commands
+        r"\b(start|begin|resume|continue|return to)\s+(my\s+|the\s+|our\s+)?(english\s+)?reviews?\b",
+
+        # Natural expressions
+        r"\b(let us|lets)\s+(start|begin|do|continue|resume|return to|come back to|get back to|go back to)\s+(the\s+|my\s+|our\s+)?(english\s+)?reviews?\b",
+        r"\b(can we|could we|shall we)\s+(start|begin|do|continue|resume|return to|come back to|get back to|go back to)\s+(the\s+|my\s+|our\s+)?(english\s+)?reviews?\b",
+        r"\bi (want|would like|wanna)\s+to\s+(start|begin|do|continue|resume|return to|get back to|go back to)\s+(the\s+|my\s+|our\s+)?(english\s+)?reviews?\b",
+
+        # Short or imperfect expressions
+        r"^(let\s+s|lets?|let's|let us)\s+(go\s+)?back$",
+        r"^(come|get)\s+back$",
+        r"^back\s+to\s+(the\s+)?review$",
+        r"^(continue|resume)\s*$",
+
+        # Other expressions
+        r"\bquiz me on my mistakes\b",
+        r"\bpractice my saved mistakes\b",
+    ]
+
+    return any(re.search(pattern, text) for pattern in patterns)
+def wants_to_pause_reviews(message):
+    text = normalize(message)
+    patterns = [
+        r"\b(stop|pause|disable|cancel)\s+(the\s+)?(reviews?|review session)\b",
+        r"\bno more reviews?\b",
+        r"\bno reviews? (for now|right now|today)\b",
+        r"\bnot now\b",
+        r"\bmaybe later\b",
+        r"\blet's talk about something else\b",
+        r"\blet us talk about something else\b",
+        r"\bchange the subject\b",
+        r"\bi do not want (a )?review\b",
+        r"\bi don't want (a )?review\b",
+        r"\bcould you stop giving me reviews?\b",
+    ]
+    return any(re.search(pattern, text) for pattern in patterns)
+
+
+# ============================================================
+# 4. ENGLISH TUTOR INSTRUCTIONS
 # ============================================================
 
 SYSTEM_PROMPT = """
@@ -5060,53 +184,49 @@ the user improve their English while having natural, useful conversations.
 For EVERY user message, follow these steps in order.
 
 STEP 1 — CORRECT THE USER'S ENGLISH
-- Check grammar, spelling, punctuation, and word choice.
-- If there are mistakes, show the corrected sentence.
-- Briefly explain important mistakes in simple English.
-- If the sentence is already correct, say so. Do not invent mistakes.
-- Preserve the user's original meaning.
-- Offer a more natural expression when useful.
+- Check grammar, spelling, and genuinely incorrect word choice.
+- Correct genuine errors and preserve the user's intended meaning.
+- Briefly explain important corrections in simple English.
+- If the message is correct, say: "Your sentence is already correct."
+- Do not invent mistakes or over-correct casual conversation.
+- Do not treat optional punctuation or capitalization as important errors.
+- A correct but informal expression is not wrong. Label it Informal only
+  when useful, and optionally offer a Neutral or Formal alternative.
+- A correct but less natural expression should be presented as a suggestion,
+  never as a mistake.
+- Do not save correct informal expressions as mistakes.
 
 STEP 2 — ANSWER THE ACTUAL MESSAGE
 - Answer the user's actual question directly.
-- Do not let English correction replace the actual answer.
-- Respond naturally to opinions and experiences.
+- Do not let English correction replace the answer.
+- Respond naturally to opinions, experiences, and conversational messages.
 - If the user says you missed a question, answer that question.
 - Never invent current information or previous events.
 
 STEP 3 — USE PREVIOUS CONVERSATION
-- Check both user messages and assistant responses in the supplied history.
-- When recalling a saved English mistake, use structured learner memory.
+- Use the supplied conversation history and structured learner memory.
+- When recalling saved mistakes, use database records only.
 - Never invent a previous message, correction, or learning result.
 - If relevant information is unavailable, say so clearly.
-- When asked to list structured mistakes, use database records only.
 
 STEP 4 — CONTINUE NATURALLY
 - Ask at most one short, relevant follow-up question when useful.
 - Do not ask a follow-up question every time.
-
-STEP 5 — ACT AS A PERSONAL ENGLISH TEACHER
-- Use the structured learner memory and review information supplied.
-- The Python application manages scheduled review questions after your answer.
-- Do not ask scheduled review questions yourself.
-- Answer the user's current question before the application adds a review.
-- Keep reminders brief; do not repeatedly interrupt the user.
-- Do not claim mastery based on one correct answer.
-- Encourage genuine progress.
-
-STEP 6 — TEACH THROUGH PRACTICE
-- Do not start or score scheduled reviews yourself; the application handles them.
-- Do not reveal a due mistake's correction as part of an unsolicited quiz.
-- Explain the result in simple, friendly English.
-- Never claim that a result was recorded unless the application confirms it.
 - Do not turn every ordinary conversation into an exercise.
 
-STEP 7 — ADAPT TO PROGRESS
+STEP 5 — ACT AS A PERSONAL ENGLISH TEACHER
+- Use the learner memory, recurring mistakes, and progress statistics supplied.
+- Python manages review state, review questions, scoring, and scheduling.
+- Never start or score a scheduled review yourself.
+- Never reveal a due mistake's correction in an unsolicited quiz.
+- Never claim a review was recorded unless the application confirms it.
+- Do not claim mastery based on one correct answer.
+
+STEP 6 — ADAPT TO PROGRESS
 - Use supplied review results and statistics.
-- Give more practice to rules the user repeatedly gets wrong.
-- Gradually revisit rules the user answers correctly.
+- Give extra explanation for recurring genuine errors.
 - Do not invent review dates or results.
-- If no review is due, continue normally.
+- If no review is requested, continue normal conversation.
 
 MANDATORY RESPONSE FORMAT
 
@@ -5117,9 +237,10 @@ English correction:
   "Your sentence is already correct."
 
 Why / More natural English:
-- Explain important corrections briefly.
+- Explain important genuine corrections briefly.
 - If no correction is needed, say:
   "No correction is needed."
+- Optional natural/formal alternatives must be clearly labelled as suggestions.
 
 Answer:
 - Answer the actual question or respond to the message.
@@ -5129,14 +250,26 @@ FORMATTING RULES
 - Always use the three headings in the specified order.
 - Do not invent English mistakes.
 - Do not repeat corrections unnecessarily.
-- Keep explanations friendly and suitable for an English learner.
 - Preserve natural conversation and prioritize the user's question.
 - Never display internal application IDs, markers, or debug instructions.
+
+FORMAL AND INFORMAL ENGLISH
+- Clearly distinguish Formal, Informal, and Neutral English when relevant.
+- Do not suggest that informal English is incorrect simply because it is informal.
+- Do not force a formal alternative into every response.
+
+REVIEW CHOICE
+- The learner controls whether the review session is active.
+- If the learner pauses or declines reviews, accept the decision.
+- A paused review remains saved and unfinished.
+- Resume the existing pending review when the learner explicitly asks to review again.
+- Do not repeatedly remind the learner about a paused review.
+- Python manages review state, scoring, and scheduling.
 """
 
 
 # ============================================================
-# 4. NORMALIZATION AND DUPLICATE-SAFE MISTAKE SAVING
+# 5. NORMALIZATION AND DUPLICATE-SAFE MISTAKE SAVING
 # ============================================================
 
 def normalize(text):
@@ -5146,8 +279,19 @@ def normalize(text):
     return " ".join(text.split())
 
 
+def extract_review_answer(message):
+    """Extract an explicitly submitted answer to a pending review."""
+    pattern = r"^\s*my answer to the review is\s*:\s*(.+?)\s*$"
+    match = re.match(
+        pattern,
+        message or "",
+        flags=re.IGNORECASE | re.DOTALL
+    )
+    return match.group(1).strip() if match else None
+
+
 def save_mistake_if_new(mistake):
-    """Save a mistake unless its normalized original/correction already exists."""
+    """Save a genuine mistake unless its normalized pair already exists."""
     try:
         target_original = normalize(mistake["original_sentence"])
         target_correction = normalize(mistake["correction"])
@@ -5156,14 +300,11 @@ def save_mistake_if_new(mistake):
             return False
 
         for row in get_mistakes():
-            # Existing memory rows are (id, original, correction,
-            # explanation, category, created_at).
-            original = row[1]
-            correction = row[2]
-
+            # Existing rows: (id, original, correction, explanation,
+            # category, created_at).
             if (
-                normalize(original) == target_original
-                and normalize(correction) == target_correction
+                normalize(row[1]) == target_original
+                and normalize(row[2]) == target_correction
             ):
                 print("[DEBUG] This mistake is already saved.")
                 return False
@@ -5183,7 +324,7 @@ def save_mistake_if_new(mistake):
 
 
 # ============================================================
-# 5. DETECT A GENUINE ENGLISH MISTAKE
+# 6. JSON PARSING AND GENUINE MISTAKE DETECTION
 # ============================================================
 
 def parse_json_object(content):
@@ -5198,7 +339,6 @@ def parse_json_object(content):
     except json.JSONDecodeError:
         pass
 
-    # Fallback if a model wraps the JSON in extra text.
     match = re.search(r"\{.*\}", content, flags=re.DOTALL)
     if not match:
         return None
@@ -5210,13 +350,18 @@ def parse_json_object(content):
         return None
 
 
-def detect_english_mistake(user_text, tutor_answer):
-    """Identify a genuine English mistake using Gemma."""
+def detect_english_mistake(user_text, tutor_answer=None):
+    """
+    Detect only genuine errors in the latest user message.
+    The tutor's answer is intentionally not sent to the detector.
+    """
     extraction_prompt = """
-You are an English mistake detector. Analyze only the user's latest
-message for a genuine grammar, spelling, punctuation, or word-choice error.
+You are a strict, careful English mistake detector.
 
-Return one valid JSON object with exactly these fields:
+Analyze ONLY the user's latest message. Identify only genuine,
+unambiguous grammar, spelling, or vocabulary errors.
+
+Return exactly one JSON object with these fields:
 {
   "has_mistake": false,
   "original_sentence": "",
@@ -5225,12 +370,24 @@ Return one valid JSON object with exactly these fields:
   "category": ""
 }
 
-If the English is correct, set has_mistake to false.
-Do not invent mistakes. Preserve the original wording in original_sentence.
-If a genuine mistake exists, provide a correction and short explanation.
-Use a category such as grammar, spelling, vocabulary, punctuation, word_choice.
-Do not treat a question about memory or the tutor as a practice sentence
-unless it contains a genuine English error. Return JSON only.
+Rules:
+1. Do not invent mistakes.
+2. Do not classify correct informal English as incorrect.
+3. Do not classify short conversational expressions or fragments as errors.
+4. Do not treat optional punctuation or capitalization in casual chat
+   as genuine learning mistakes.
+5. Do not save stylistic preferences as mistakes.
+6. A correct but informal expression is NOT a mistake.
+7. A correct but less natural expression is NOT a mistake.
+8. Only identify genuine errors that are useful for English learning.
+9. Preserve the user's exact original wording in original_sentence.
+10. Do not use a tutor's response or suggested alternative as evidence.
+11. If the message contains no clear English error, set has_mistake to false.
+12. If the message is mainly not English, set has_mistake to false.
+13. Do not mark a sentence wrong merely because another wording is preferred.
+
+Use a category such as grammar, spelling, vocabulary, or word_choice.
+Return JSON only.
 """
 
     try:
@@ -5239,13 +396,7 @@ unless it contains a genuine English error. Return JSON only.
             format="json",
             messages=[
                 {"role": "system", "content": extraction_prompt},
-                {
-                    "role": "user",
-                    "content": (
-                        f"User's message:\n{user_text}\n\n"
-                        f"Tutor's answer:\n{tutor_answer}"
-                    ),
-                },
+                {"role": "user", "content": f"User's message:\n{user_text}"},
             ],
         )
 
@@ -5255,9 +406,14 @@ unless it contains a genuine English error. Return JSON only.
         if not data or data.get("has_mistake") is not True:
             return None
 
-        for field in ("original_sentence", "correction", "explanation", "category"):
+        fields = ("original_sentence", "correction", "explanation", "category")
+        for field in fields:
             if not isinstance(data.get(field), str) or not data[field].strip():
                 return None
+
+        # Reject identical original/correction pairs.
+        if normalize(data["original_sentence"]) == normalize(data["correction"]):
+            return None
 
         return data
 
@@ -5267,7 +423,7 @@ unless it contains a genuine English error. Return JSON only.
 
 
 # ============================================================
-# 6. STRUCTURED MISTAKE MEMORY AND DUE REVIEWS
+# 7. STRUCTURED MISTAKE MEMORY AND DUE REVIEWS
 # ============================================================
 
 def build_mistake_memory():
@@ -5334,9 +490,8 @@ def build_recurring_mistake_memory():
 
 
 def build_due_review_context(limit=2):
-    """Return distinct due mistakes; Python itself will ask the review question."""
-    # Original candidate limit preserved: candidates = get_due_mistakes(limit=100)
-    candidates = get_due_mistakes(limit=1000)  # Added: find unique due reviews
+    """Return distinct due mistakes for Python-managed review selection."""
+    candidates = get_due_mistakes(limit=1000)
     due_mistakes = []
     seen = set()
 
@@ -5355,9 +510,9 @@ def build_due_review_context(limit=2):
     lines = [
         "SCHEDULED ENGLISH REVIEWS (application-managed):",
         "These saved mistakes are due for review.",
-        "Do not ask a review question yourself; Python will append one after your answer.",
-        "Do not mention these review records unless the user asks about learning history.",
-        "Never claim a review was completed or scored unless application feedback says so.",
+        "Python selects and displays a review only when the learner has an active review session.",
+        "Do not ask a review question yourself.",
+        "Do not reveal corrections unless the learner asks for help.",
     ]
 
     for row in due_mistakes:
@@ -5381,81 +536,14 @@ def build_due_review_context(limit=2):
     return "\n".join(lines), due_mistakes
 
 
-# def looks_like_separate_question(message):
-#     """Avoid grading an obvious new question as an answer to the pending quiz."""
-#     stripped = (message or "").strip().lower()
-#     if "?" in stripped:
-#         return True
-#     return bool(re.match(
-#         r"^(what|why|when|where|who|whom|whose|which|how|can|could|would|will|do|does|did|is|are|am|was|were|have|has|had)\b",
-#         stripped,
-#     ))
-
-
-# def looks_like_separate_question(message):
-#     """Detect a new question without relying only on punctuation."""
-#     stripped = (message or "").strip().lower()
-
-#     if not stripped:
-#         return False
-
-#     question_starters = (
-#         r"^(what|why|when|where|who|whom|whose|which|how|"
-#         r"can|could|would|will|do|does|did|is|are|am|was|were|"
-#         r"have|has|had)\b"
-#     )
-
-#     return bool(re.match(question_starters, stripped))
-
-
-def looks_like_separate_question(message):
-    """Detect clear new questions without relying only on the first word."""
-    stripped = (message or "").strip().lower()
-
-    if not stripped:
-        return False
-
-    # Only treat clear, standalone requests as new questions.
-    question_patterns = (
-        r"^(what|why|when|where|who|whom|whose|which|how)"
-        r"\b.*\?\s*$",
-        r"^(can|could|would|will|do|does|did|is|are|am|was|were|"
-        r"have|has|had)\b.*\?\s*$",
-    )
-
-    return any(re.search(pattern, stripped) for pattern in question_patterns)
-
-# PHASE3_STEP5_EXPANDED_HELP_DETECTION
-# Added definition; the original help detector above remains unchanged.
-# def looks_like_review_help_request(message):
-#     """Recognize help requests rather than scoring them as review answers."""
-#     stripped = normalize(message)
-#     help_patterns = [
-#         r"\bremind me\b",
-#         r"\brepeat\b",
-#         r"\bsay that again\b",
-#         r"\bwhat was the sentence\b",
-#         r"\bwhat sentence (do|did|should|must|need to)\b",
-#         r"\bwhich sentence\b",
-#         r"\bgive me a hint\b",
-#         r"\bhelp me\b",
-#         r"\bexplain (it|that|the sentence|the question)\b",
-#         r"\bi (do not|don't|dont) remember\b",
-#         r"\bi (do not|don't|dont) understand\b",
-#         r"\bcan we skip\b",
-#         r"\bcan we do this later\b",
-#         r"\bwhat do i need to correct\b",
-#         r"\btell me (the )?(sentence|question)\b",
-#     ]
-#     return any(re.search(pattern, stripped) for pattern in help_patterns)
-
-
+# ============================================================
+# 8. REVIEW HELP AND ANSWER EVALUATION
+# ============================================================
 
 def looks_like_review_help_request(message):
     """Recognize clear requests for help with a pending review."""
     stripped = normalize(message)
-
-    help_patterns = [
+    patterns = [
         r"\brepeat\b",
         r"\bsay that again\b",
         r"\bwhat was the sentence\b",
@@ -5467,16 +555,11 @@ def looks_like_review_help_request(message):
         r"\bi (do not|don't|dont) remember\b",
         r"\bi (do not|don't|dont) understand\b",
         r"\bcan we skip\b",
-        r"\bcan we do this later\b",
         r"\bwhat do i need to correct\b",
         r"\btell me (the )?(sentence|question)\b",
     ]
+    return any(re.search(pattern, stripped) for pattern in patterns)
 
-    return any(re.search(pattern, stripped) for pattern in help_patterns)
-
-# ============================================================
-# 7. REVIEW ANSWER EVALUATION
-# ============================================================
 
 def find_mistake_by_id(mistake_id):
     """Find a saved mistake by its database ID."""
@@ -5487,10 +570,7 @@ def find_mistake_by_id(mistake_id):
 
 
 def evaluate_review_answer(user_answer, mistake):
-    """
-    Return (correct, feedback), or (None, error_message) if evaluation fails.
-    The database is updated only when a valid boolean is returned.
-    """
+    """Return (correct, feedback), or (None, error_message) on failure."""
     original = mistake[1]
     correction = mistake[2]
     explanation = mistake[3]
@@ -5505,14 +585,13 @@ Learner's answer: {user_answer}
 
 Judge whether the answer correctly demonstrates the target rule.
 Accept equivalent wording if it demonstrates the same rule and meaning.
-Return one JSON object only, with:
+Return one JSON object only:
 {{"correct": true, "feedback": "Short, learner-friendly feedback"}}
 The correct value must be a JSON boolean, not a string.
 """
 
     last_error = "The model returned an empty or invalid response."
 
-    # Retry once if the model returns empty/invalid JSON.
     for attempt in range(2):
         try:
             response = client.chat(
@@ -5537,27 +616,45 @@ The correct value must be a JSON boolean, not a string.
         except Exception as error:
             last_error = str(error)
 
-        if attempt == 0:
-            continue
-
     return None, last_error
 
 
 # ============================================================
-# 8. INITIALIZE
+# 9. INITIALIZE
 # ============================================================
 
+# init_db()
+# init_tutor_state()
+
+# print("\nEnglish Tutor is ready!")
+# print("Your conversation history and saved mistakes are available.")
+# print("Review sessions start only when you ask to start or resume them.")
+# print("Type 'exit' to close the tutor.\n")
 init_db()
 init_tutor_state()
 
 print("\nEnglish Tutor is ready!")
 print("Your conversation history and saved mistakes are available.")
-print("Phase 3 review scheduling is enabled (Python-managed quizzes).")
-print("Type 'exit' to close the tutor.\n")
+
+# Remind the learner about an unfinished review without activating it.
+startup_review_id = get_active_review_id()
+
+if startup_review_id is not None:
+    pending_review = find_mistake_by_id(startup_review_id)
+
+    if pending_review:
+        print("\nYou have an unfinished English review:")
+        print(f'"{pending_review[1]}"')
+        print("Type 'g' to continue.")
+        print("You can also start a normal conversation.")
+    else:
+        print("\nAn unfinished review was found, but its saved mistake is unavailable.")
+
+print("\nType 'exit' to close the tutor.\n")
 
 
 # ============================================================
-# 9. MAIN CONVERSATION LOOP
+# 10. MAIN CONVERSATION LOOP
 # ============================================================
 
 while True:
@@ -5571,15 +668,52 @@ while True:
         continue
 
     try:
-        # If a previous tutor turn asked a review question, evaluate this
-        # message against the persisted active review ID.
         review_feedback = ""
         active_review_id = get_active_review_id()
-        preserve_active_review = False
+        review_session_active = is_review_session_active()
+        review_answer = extract_review_answer(message)
+
         review_was_scored = False
         review_help_requested = False
+        pause_requested = wants_to_pause_reviews(message)
+        start_requested = wants_to_start_reviews(message)
 
-        if active_review_id is not None:
+        # Pause takes priority over any other review intent.
+        if pause_requested:
+            set_review_session_active(False)
+            review_session_active = False
+            review_feedback = (
+                "\nREVIEW SESSION PAUSED:\n"
+                "The learner has chosen to pause reviews. Respect this choice. "
+                "Do not display a review or reminder. Continue the conversation "
+                "normally. Keep any unfinished review saved for later.\n"
+            )
+            print("[DEBUG] Review session paused; pending review preserved.")
+
+        elif start_requested:
+            set_review_session_active(True)
+            review_session_active = True
+            review_feedback = (
+                "\nREVIEW SESSION STARTED OR RESUMED:\n"
+                "The learner explicitly asked to start or resume reviews. "
+                "Python will provide the pending review or select a due review "
+                "after the normal answer. Do not create a review yourself.\n"
+            )
+            print("[DEBUG] Review session activated.")
+
+        # Reload the active ID after processing the user's intent.
+        active_review_id = get_active_review_id()
+
+        # An explicitly prefixed answer may complete the saved pending review
+        # even if the learner had previously paused the review session.
+        if (
+            (review_session_active or review_answer is not None)
+            and active_review_id is not None
+        ):
+            if review_answer is not None:
+                set_review_session_active(True)
+                review_session_active = True
+
             active_review = find_mistake_by_id(active_review_id)
 
             if active_review is None:
@@ -5587,74 +721,119 @@ while True:
                 active_review_id = None
                 print("[DEBUG] Active review no longer exists; cleared its ID.")
 
-            elif looks_like_review_help_request(message):
-                # A request for help is not a quiz answer.
-                preserve_active_review = True
-                review_help_requested = True
-
-                review_feedback = (
-                    "\nPENDING REVIEW — LEARNER REQUESTED HELP:\n"
-                    "The learner asked for help with the pending review. "
-                    "Do not evaluate or score this message. "
-                    "Repeat the exact sentence they need to correct, "
-                    "optionally give a small hint without revealing the full correction, "
-                    "and invite them to try again. "
-                    "Keep the same review active.\n"
+            elif review_answer is not None:
+                result, feedback = evaluate_review_answer(
+                    review_answer, active_review
                 )
-
-                print(
-                    "[DEBUG] Review help requested; "
-                    "pending review preserved without scoring."
-                )
-
-            elif looks_like_separate_question(message):
-                # A question is likely a new request, not the user's quiz answer.
-                preserve_active_review = True
-                review_feedback = (
-                    "\nPENDING REVIEW:\n"
-                    "The user's latest message appears to be a separate question, "
-                    "not an answer to the pending review. Answer their question "
-                    "normally and briefly remind them that the review is still "
-                    "waiting. Do not score this message.\n"
-                )
-                print("[DEBUG] Pending review preserved; latest message looks like a question.")
-
-            else:
-                result, feedback = evaluate_review_answer(message, active_review)
 
                 if result is not None:
                     record_review_result(active_review_id, result)
-                    set_active_review_id(None)
                     review_was_scored = True
-                    review_feedback = (
+
+                    if result:
+                        # Correct answer: complete this review.
+                        set_active_review_id(None)
+                        active_review_id = None
+                        print("[DEBUG] Review completed successfully.")
+
+                    else:
+                        # Incorrect answer: preserve the same review ID.
+                        print(
+                            "[DEBUG] Incorrect answer. "
+                            "Keeping the same review ID for retry."
+                        )
+
+                    review_feedback += (
                         "\nRESULT OF THE JUST-ANSWERED REVIEW:\n"
                         f"Recorded result: {'correct' if result else 'incorrect'}.\n"
                         f"Evaluator feedback: {feedback or 'No extra feedback provided.'}\n"
-                        "Acknowledge this result accurately in your response. "
-                        "Do not claim mastery from one correct answer.\n"
+                        "Acknowledge this result accurately. Do not claim mastery "
+                        "from one correct answer.\n"
                     )
+    
                     print(
                         "[DEBUG] Review result recorded:",
                         "correct" if result else "incorrect",
                     )
+
                 else:
-                    # Do not update counters when evaluation fails.
-                    # Keep the review ID so it can be retried next turn.
-                    preserve_active_review = True
-                    review_feedback = (
+                    review_feedback += (
                         "\nREVIEW EVALUATION STATUS:\n"
-                        "The evaluator failed to validate the previous review "
-                        "answer. Do not claim that it was recorded or judged "
-                        "correct. Tell the user briefly that the review could "
-                        "not be scored and invite them to retry the same answer.\n"
+                        "The evaluator could not validate the answer. Do not "
+                        "claim it was recorded. Ask the learner to retry using "
+                        "the exact review-answer prefix.\n"
                     )
                     print("[DEBUG] Review evaluation failed:", feedback)
+                    
+            #     if result is not None:
+            #         record_review_result(active_review_id, result)
+            #         set_active_review_id(None)
+            #         active_review_id = None
+            #         review_was_scored = True
+
+            #         review_feedback += (
+            #             "\nRESULT OF THE JUST-ANSWERED REVIEW:\n"
+            #             f"Recorded result: {'correct' if result else 'incorrect'}.\n"
+            #             f"Evaluator feedback: {feedback or 'No extra feedback provided.'}\n"
+            #             "Acknowledge this result accurately. Do not claim mastery "
+            #             "from one correct answer.\n"
+            #         )
+            #         print(
+            #             "[DEBUG] Review result recorded:",
+            #             "correct" if result else "incorrect",
+            #         )
+
+            #     else:
+            #         review_feedback += (
+            #             "\nREVIEW EVALUATION STATUS:\n"
+            #             "The evaluator could not validate the answer. Do not "
+            #             "claim it was recorded. Ask the learner to retry using "
+            #             "the exact review-answer prefix.\n"
+            #         )
+            #         print("[DEBUG] Review evaluation failed:", feedback)
+
+            # elif looks_like_review_help_request(message):
+            #     review_help_requested = True
+            #     review_feedback += (
+            #         "\nPENDING REVIEW — LEARNER REQUESTED HELP:\n"
+            #         "Do not score this message. Repeat the exact sentence to "
+            #         "correct and give a small hint without revealing the full "
+            #         "correction. Keep the same review active.\n"
+            #     )
+            #     print("[DEBUG] Review help requested; no score recorded.")
+
+            elif not start_requested:
+                # An ordinary message while a review is pending pauses the
+                # review session automatically, without scoring or reminders.
+                set_review_session_active(False)
+                review_session_active = False
+                review_feedback += (
+                    "\nREVIEW SESSION PAUSED AUTOMATICALLY:\n"
+                    "The latest message is ordinary conversation, not a review "
+                    "answer. Answer it naturally. Do not score, display, or "
+                    "remind the learner about the pending review. Preserve it "
+                    "for a later explicit resume request.\n"
+                )
+                print(
+                    "[DEBUG] Ordinary message detected; review paused "
+                    "without scoring."
+                )
+
+        # A review answer without an active pending review is not a normal
+        # English practice sentence; tell the model not to pretend it was scored.
+        elif review_answer is not None and not review_session_active:
+            review_feedback += (
+                "\nNO ACTIVE REVIEW:\n"
+                "The learner submitted a review-answer prefix, but there is no "
+                "active review session. Do not claim that an answer was scored. "
+                "Explain briefly that they can ask to resume reviews first.\n"
+            )
 
         save_message("user", message)
 
         history = get_chat_history(limit=30)
         mistake_memory, mistake_count = build_mistake_memory()
-        recurring_memory = build_recurring_mistake_memory()  # Added for Phase 3
+        recurring_memory = build_recurring_mistake_memory()
         review_context, due_mistakes = build_due_review_context(limit=2)
         stats = get_learning_stats()
 
@@ -5664,31 +843,27 @@ while True:
             f"Correct review answers: {stats['correct_answers']}\n"
             f"Incorrect review answers: {stats['wrong_answers']}\n"
             f"Reviews due: {stats['due_reviews']}\n"
+            f"Review session active: {review_session_active}\n"
         )
 
         messages = [{
             "role": "system",
             "content": (
                 SYSTEM_PROMPT
-                + "\n\n"
-                + mistake_memory
-                + "\n\n"
-                + recurring_memory
-                + "\n\n"
-                + review_context
-                + "\n\n"
-                + progress_context
-                + "\n\n"
-                + review_feedback
+                + "\n\n" + mistake_memory
+                + "\n\n" + recurring_memory
+                + "\n\n" + review_context
+                + "\n\n" + progress_context
+                + "\n\n" + review_feedback
                 + "\n\nAPPLICATION RULE:\n"
-                "Do not generate review markers or start a scheduled quiz. "
-                "Python will select a due mistake and append the review question "
-                "after your answer when appropriate. Never claim a review was "
-                "scored unless the application explicitly provides that result."
+                "Do not generate review markers, reminders, or scheduled quiz "
+                "questions. Python alone manages reviews. Answer the user's "
+                "latest message first. Never claim a review was scored unless "
+                "the application explicitly provides that result."
             ),
         }]
 
-        # Original history loop preserved: for role, content in history:
+        # Keep the original history behavior.
         for role, content in history[-10:]:
             if role in ("user", "assistant"):
                 messages.append({"role": role, "content": content})
@@ -5696,32 +871,49 @@ while True:
         print(
             f"\n[DEBUG] History messages: {len(history)} | "
             f"Unique mistakes: {mistake_count} | "
-            f"Due reviews: {len(due_mistakes)}"
+            f"Due reviews: {len(due_mistakes)} | "
+            f"Review session active: {review_session_active}"
         )
 
         response = client.chat(model=MODEL, messages=messages)
         raw_answer = response.get("message", {}).get("content", "")
 
-        # Python owns review selection and activation; no LLM marker is needed.
-        if preserve_active_review:
-            next_active_review_id = active_review_id
-        else:
-            next_active_review_id = None
+        # Select a due review only if the learner explicitly activated reviews.
+        # Do not select another review in the same turn as a scored answer;
+        # the feedback is shown first and the next review can appear next turn.
+        next_active_review_id = get_active_review_id()
 
-        # If a review was just scored, let the learner see the feedback first.
-        # Otherwise, ask one due review after answering the user's current message.
+        # When the learner explicitly resumes, show the same unfinished review.
         if (
-            next_active_review_id is None
+            review_session_active
+            and start_requested
+            and next_active_review_id is not None
+        ):
+            pending_mistake = find_mistake_by_id(next_active_review_id)
+            if pending_mistake is not None:
+                raw_answer = raw_answer.rstrip() + (
+                    "\n\nResuming your pending review: "
+                    "How would you correct this sentence?\n"
+                    f'“{pending_mistake[1]}”\n'
+                    "When you are ready, begin your answer with: "
+                    "'My answer to the review is:'"
+                )
+
+        # If there is no unfinished review, select one due mistake.
+        elif (
+            review_session_active
+            and next_active_review_id is None
             and not review_was_scored
             and due_mistakes
         ):
             selected_review = due_mistakes[0]
             next_active_review_id = selected_review[0]
-            review_question = (
+            raw_answer = raw_answer.rstrip() + (
                 "\n\nQuick review: How would you correct this sentence?\n"
-                f'“{selected_review[1]}”'
+                f'“{selected_review[1]}”\n'
+                "When you are ready, begin your answer with: "
+                "'My answer to the review is:'"
             )
-            raw_answer = raw_answer.rstrip() + review_question
             print("[DEBUG] Python selected due review ID:", next_active_review_id)
 
         set_active_review_id(next_active_review_id)
@@ -5731,10 +923,15 @@ while True:
         print("\nTutor:", answer, "\n")
         save_message("assistant", answer)
 
-        # Do not treat a review-help request as a practice answer.
-        if not review_help_requested:
-            # Detect and save genuine mistakes; duplicates ignore punctuation.
-            mistake = detect_english_mistake(message, answer)
+        # Do not store review commands, review answers, or review-help requests
+        # as ordinary learner mistakes.
+        is_review_control_message = (
+            start_requested or pause_requested or review_answer is not None
+            or review_help_requested
+        )
+
+        if not is_review_control_message:
+            mistake = detect_english_mistake(message)
             if mistake:
                 save_mistake_if_new(mistake)
 
