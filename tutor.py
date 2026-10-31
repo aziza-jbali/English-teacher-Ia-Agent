@@ -643,10 +643,26 @@ if startup_review_id is not None:
     pending_review = find_mistake_by_id(startup_review_id)
 
     if pending_review:
-        print("\nYou have an unfinished English review:")
-        print(f'"{pending_review[1]}"')
-        print("Type 'g' to continue.")
-        print("You can also start a normal conversation.")
+        # print("\nYou have an unfinished English review:")
+        # print(f'"{pending_review[1]}"')
+        # print("Type 'g' to continue.")
+        # print("You can also start a normal conversation.")
+        print("\n" + "=" * 60)
+        print("🔥 YOUR ENGLISH PROGRESS IS WAITING FOR YOU! 🔥")
+        print("=" * 60)
+        print("\nYou have an unfinished English review.")
+        print("Remember: Every mistake is an opportunity to become better.")
+        print("Real progress comes from practicing, making mistakes,")
+        print("learning from them, and never giving up!")
+
+        print("\n💪 Don't leave your progress unfinished.")
+        print("Take a moment, challenge yourself, and prove what you have learned!")
+
+        print(f'\nYour pending sentence:\n"{pending_review[1]}"')
+
+        print("\n👉 Type 'g' to continue your review.")
+        print("Your English journey continues one step at a time!")
+        print("=" * 60)
     else:
         print("\nAn unfinished review was found, but its saved mistake is unavailable.")
 
@@ -750,6 +766,17 @@ while True:
                         "Acknowledge this result accurately. Do not claim mastery "
                         "from one correct answer.\n"
                     )
+                    if result is False:
+                        review_feedback += (
+                            "\nSTRICT REVIEW RETRY INSTRUCTION:\n"
+                            "The learner's answer is incorrect.\n"
+                            "Explain the specific error briefly and kindly.\n"
+                            "Ask the learner to correct the SAME original sentence again.\n"
+                            "Do not ask whether the learner wants another sentence.\n"
+                            "Do not offer to move to a different review.\n"
+                            "Do not introduce a new review question.\n"
+                            "The current review remains active.\n"
+                        )
     
                     print(
                         "[DEBUG] Review result recorded:",
@@ -852,7 +879,7 @@ while True:
                 SYSTEM_PROMPT
                 + "\n\n" + mistake_memory
                 + "\n\n" + recurring_memory
-                + "\n\n" + review_context
+                # + "\n\n" + review_context
                 + "\n\n" + progress_context
                 + "\n\n" + review_feedback
                 + "\n\nAPPLICATION RULE:\n"
@@ -863,10 +890,17 @@ while True:
             ),
         }]
 
-        # Keep the original history behavior.
-        for role, content in history[-10:]:
-            if role in ("user", "assistant"):
-                messages.append({"role": role, "content": content})
+        # # Keep the original history behavior.
+        # for role, content in history[-10:]:
+        #     if role in ("user", "assistant"):
+        #         messages.append({"role": role, "content": content})
+        # Do not send old review conversations when starting/resuming.
+# Python will display the review question itself.
+        if not start_requested:
+            for role, content in history[-10:]:
+                if role in ("user", "assistant"):
+            
+                    messages.append({"role": role, "content": content})
 
         print(
             f"\n[DEBUG] History messages: {len(history)} | "
@@ -903,7 +937,7 @@ while True:
         elif (
             review_session_active
             and next_active_review_id is None
-            and not review_was_scored
+            # and not review_was_scored
             and due_mistakes
         ):
             selected_review = due_mistakes[0]
