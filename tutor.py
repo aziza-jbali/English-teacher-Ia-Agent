@@ -28,6 +28,11 @@ from memory import (
     record_review_result,
     get_learning_stats,
     get_recurring_mistakes,  # Added for Phase 3 personalization
+    save_vocabulary,
+    get_vocabulary,
+    search_vocabulary,
+    update_vocabulary,
+    delete_vocabulary
 )
 
 
@@ -50,7 +55,66 @@ client = Client(
 MODEL = "gemma4:31b"
 DB_PATH = Path(__file__).parent / "learner_memory.db"
 
+def extract_vocabulary(text, source):
+    """
+    Extract useful English words and expressions
+    from the learner or tutor messages.
+    """
 
+    prompt = f"""
+    You are an English vocabulary teacher.
+
+    Analyze this message and extract up to 3 useful
+    English words or expressions worth learning.
+
+    Message source: {source}
+    Message: {text}
+
+    Ignore basic everyday words and focus on useful
+    vocabulary, natural expressions, and advanced phrases.
+
+    Return ONLY valid JSON in this format:
+    {{
+        "vocabulary": [
+            {{
+                "term": "make progress",
+                "item_type": "expression",
+                "meaning_ar": "يحرز تقدماً",
+                "definition_en": "To improve or move forward toward a goal.",
+                "example": "She is making progress in English.",
+                "synonyms": "improve, advance",
+                "topic": "English Learning"
+            }}
+        ]
+    }}
+    """
+
+    try:
+        response = client.chat(
+            model=MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            format="json"
+        )
+
+        content = response["message"]["content"]
+        # extract_vocabulary(content, "Tutor")
+
+        data = json.loads(content)
+
+        for item in data.get("vocabulary", []):
+            save_vocabulary(
+                term=item["term"],
+                item_type=item["item_type"],
+                meaning_ar=item["meaning_ar"],
+                definition_en=item["definition_en"],
+                example=item.get("example"),
+                synonyms=item.get("synonyms"),
+                topic=item.get("topic"),
+                source=source
+            )
+
+    except Exception as e:
+        print(f"[Vocabulary extraction error] {e}")
 # ============================================================
 # 2. PERSISTENT REVIEW STATE
 # ============================================================
@@ -682,7 +746,7 @@ while True:
 
     if not message:
         continue
-
+    
     try:
         review_feedback = ""
         active_review_id = get_active_review_id()
@@ -693,7 +757,8 @@ while True:
         review_help_requested = False
         pause_requested = wants_to_pause_reviews(message)
         start_requested = wants_to_start_reviews(message)
-
+        if not (pause_requested or start_requested or review_answer is not None):
+            extract_vocabulary(message, "Learner")
         # Pause takes priority over any other review intent.
         if pause_requested:
             set_review_session_active(False)
@@ -954,6 +1019,8 @@ while True:
         print("[DEBUG] Active review ID:", get_active_review_id())
 
         answer = raw_answer.strip()
+        extract_vocabulary(answer, "Tutor")
+
         print("\nTutor:", answer, "\n")
         save_message("assistant", answer)
 
