@@ -58,7 +58,57 @@ def init_db():
                 last_reviewed_at TEXT
             )
         """)
+        # New unified table for all vocabulary items.
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS vocabulary_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
 
+                term TEXT NOT NULL COLLATE NOCASE,
+                item_type TEXT NOT NULL CHECK (
+                    item_type IN (
+                        'word',
+                        'expression',
+                        'phrasal verb',
+                        'idiom',
+                        'collocation'
+                    )
+                ),
+
+                grammatical_class TEXT,
+                meaning_ar TEXT NOT NULL,
+                meaning_en TEXT,
+                definition_en TEXT,
+                example TEXT,
+                synonyms TEXT,
+                topic TEXT,
+                source TEXT,
+
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                first_seen_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                last_seen_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                occurrence_count INTEGER NOT NULL DEFAULT 1,
+
+                mastery_status TEXT NOT NULL DEFAULT 'Learning'
+                    CHECK (
+                        mastery_status IN (
+                            'Learning',
+                            'Review',
+                            'Mastered'
+                        )
+                    ),
+
+                review_count INTEGER NOT NULL DEFAULT 0,
+                correct_count INTEGER NOT NULL DEFAULT 0,
+                wrong_count INTEGER NOT NULL DEFAULT 0,
+                correct_streak INTEGER NOT NULL DEFAULT 0,
+
+                next_review_at TEXT,
+                last_reviewed_at TEXT,
+                mastered_at TEXT
+            )
+        """)
         # Table for conversation history.
         connection.execute("""
             CREATE TABLE IF NOT EXISTS conversations (
@@ -547,63 +597,179 @@ def get_recurring_mistakes():
 
 #         connection.commit()
 #         return cursor.lastrowid
+# def save_vocabulary(
+#     term,
+#     item_type,
+#     meaning_ar,
+#     definition_en,
+#     example=None,
+#     synonyms=None,
+#     topic=None,
+#     source=None,
+# ):
+#     """Save an English word or expression without duplicates."""
+
+#     if item_type not in ("word", "expression"):
+#         raise ValueError("item_type must be 'word' or 'expression'.")
+
+#     term = term.strip()
+
+#     with sqlite3.connect(DB_PATH) as connection:
+#         # Check whether this term already exists (case-insensitive).
+#         existing = connection.execute("""
+#             SELECT id
+#             FROM vocabulary
+#             WHERE LOWER(TRIM(term)) = LOWER(TRIM(?))
+#             LIMIT 1
+#         """, (term,)).fetchone()
+
+#         if existing:
+#             return existing[0]
+
+#         cursor = connection.execute("""
+#             INSERT INTO vocabulary (
+#                 term,
+#                 item_type,
+#                 meaning_ar,
+#                 definition_en,
+#                 example,
+#                 synonyms,
+#                 topic,
+#                 source
+#             )
+#             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+#         """, (
+#             term,
+#             item_type,
+#             meaning_ar.strip(),
+#             definition_en.strip(),
+#             example,
+#             synonyms,
+#             topic,
+#             source,
+#         ))
+
+#         connection.commit()
+#         return cursor.lastrowid
 def save_vocabulary(
     term,
     item_type,
     meaning_ar,
-    definition_en,
+    definition_en=None,
     example=None,
     synonyms=None,
     topic=None,
     source=None,
+    grammatical_class=None,
+    meaning_en=None,
 ):
-    """Save an English word or expression without duplicates."""
+    """Save vocabulary items in the unified vocabulary_items table."""
 
-    if item_type not in ("word", "expression"):
-        raise ValueError("item_type must be 'word' or 'expression'.")
+    allowed_types = (
+        "word",
+        "expression",
+        "phrasal verb",
+        "idiom",
+        "collocation",
+    )
+
+    if item_type not in allowed_types:
+        raise ValueError(
+            f"item_type must be one of: {', '.join(allowed_types)}"
+        )
 
     term = term.strip()
 
+    if not term:
+        raise ValueError("term cannot be empty.")
+
+    if not meaning_ar or not meaning_ar.strip():
+        raise ValueError("meaning_ar cannot be empty.")
+
     with sqlite3.connect(DB_PATH) as connection:
-        # Check whether this term already exists (case-insensitive).
+
+        # Check for an existing item with the same term and type.
         existing = connection.execute("""
             SELECT id
-            FROM vocabulary
+            FROM vocabulary_items
             WHERE LOWER(TRIM(term)) = LOWER(TRIM(?))
+              AND item_type = ?
             LIMIT 1
-        """, (term,)).fetchone()
+        """, (term, item_type)).fetchone()
 
         if existing:
-            return existing[0]
+            vocabulary_id = existing[0]
 
+            # Record another occurrence without overwriting saved meanings.
+            connection.execute("""
+                UPDATE vocabulary_items
+                SET occurrence_count = occurrence_count + 1,
+                    last_seen_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            """, (vocabulary_id,))
+
+            return vocabulary_id
+
+        # Insert a new vocabulary item.
         cursor = connection.execute("""
-            INSERT INTO vocabulary (
+            INSERT INTO vocabulary_items (
                 term,
                 item_type,
+                grammatical_class,
                 meaning_ar,
+                meaning_en,
                 definition_en,
                 example,
                 synonyms,
                 topic,
                 source
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             term,
             item_type,
+            grammatical_class,
             meaning_ar.strip(),
-            definition_en.strip(),
+            meaning_en.strip() if meaning_en else None,
+            definition_en.strip() if definition_en else None,
             example,
             synonyms,
             topic,
             source,
         ))
 
-        connection.commit()
         return cursor.lastrowid
 # TO GET ALL VOCABULARY 
+# def get_vocabulary():
+#     """Retrieve all saved vocabulary items."""
+
+#     with sqlite3.connect(DB_PATH) as connection:
+#         cursor = connection.execute("""
+#             SELECT
+#                 id,
+#                 term,
+#                 item_type,
+#                 meaning_ar,
+#                 definition_en,
+#                 example,
+#                 synonyms,
+#                 topic,
+#                 source,
+#                 created_at,
+#                 mastery_status,
+#                 review_count,
+#                 correct_count,
+#                 wrong_count,
+#                 next_review_at,
+#                 last_reviewed_at
+#             FROM vocabulary
+#             ORDER BY id
+#         """)
+
+#         return cursor.fetchall()
+
 def get_vocabulary():
-    """Retrieve all saved vocabulary items."""
+    """Retrieve all saved vocabulary items from vocabulary_items."""
 
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.execute("""
@@ -623,49 +789,54 @@ def get_vocabulary():
                 correct_count,
                 wrong_count,
                 next_review_at,
-                last_reviewed_at
-            FROM vocabulary
+                last_reviewed_at,
+                grammatical_class,
+                meaning_en,
+                occurrence_count,
+                correct_streak
+            FROM vocabulary_items
             ORDER BY id
         """)
 
         return cursor.fetchall()
-
 def search_vocabulary(term):
-    """Search vocabulary by word or expression."""
+    """Search vocabulary items in vocabulary_items."""
 
     with sqlite3.connect(DB_PATH) as connection:
-            cursor = connection.execute("""
-                SELECT
-                    id,
-                    term,
-                    item_type,
-                    meaning_ar,
-                    definition_en,
-                    example,
-                    synonyms,
-                    topic,
-                    source,
-                    created_at,
-                    mastery_status,
-                    review_count,
-                    correct_count,
-                    wrong_count,
-                    next_review_at,
-                    last_reviewed_at
-                FROM vocabulary
-                WHERE term LIKE ?
-                ORDER BY term
-            """, (f"%{term.strip()}%",))
+        cursor = connection.execute("""
+            SELECT
+                id,
+                term,
+                item_type,
+                meaning_ar,
+                definition_en,
+                example,
+                synonyms,
+                topic,
+                source,
+                created_at,
+                mastery_status,
+                review_count,
+                correct_count,
+                wrong_count,
+                next_review_at,
+                last_reviewed_at,
+                grammatical_class,
+                meaning_en,
+                occurrence_count,
+                correct_streak
+            FROM vocabulary_items
+            WHERE term LIKE ?
+            ORDER BY term
+        """, (f"%{term.strip()}%",))
 
-            return cursor.fetchall()
-# results = search_vocabulary("Encoder")
-# for item in results:
-#         print("itemnnn",item)    
-
+        return cursor.fetchall()
 def update_vocabulary(
     vocabulary_id,
     meaning_ar=None,
+    meaning_en=None,
     definition_en=None,
+    grammatical_class=None,
     example=None,
     synonyms=None,
     topic=None,
@@ -675,7 +846,9 @@ def update_vocabulary(
 
     fields = {
         "meaning_ar": meaning_ar,
+        "meaning_en": meaning_en,
         "definition_en": definition_en,
+        "grammatical_class": grammatical_class,
         "example": example,
         "synonyms": synonyms,
         "topic": topic,
@@ -694,57 +867,29 @@ def update_vocabulary(
     set_clause = ", ".join(
         f"{column} = ?" for column in updates
     )
+    set_clause += ", updated_at = CURRENT_TIMESTAMP"
 
     values = list(updates.values())
     values.append(vocabulary_id)
 
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.execute(
-            f"UPDATE vocabulary SET {set_clause} WHERE id = ?",
+            f"UPDATE vocabulary_items SET {set_clause} WHERE id = ?",
             values,
         )
 
-        connection.commit()
         return cursor.rowcount > 0
-
-
 
 def delete_vocabulary(vocabulary_id):
     """Delete a vocabulary item by its ID."""
 
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.execute(
-            "DELETE FROM vocabulary WHERE id = ?",
+            "DELETE FROM vocabulary_items WHERE id = ?",
             (vocabulary_id,)
         )
 
-        connection.commit()
         return cursor.rowcount > 0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

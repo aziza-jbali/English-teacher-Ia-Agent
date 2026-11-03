@@ -55,32 +55,229 @@ client = Client(
 MODEL = "gemma4:31b"
 DB_PATH = Path(__file__).parent / "learner_memory.db"
 
+# def extract_vocabulary(text, source):
+#     """
+#     Extract useful English words and expressions
+#     from the learner or tutor messages.
+#     """
+
+#     prompt = f"""
+#     You are an English vocabulary teacher.
+
+#     Analyze this message and extract up to 3 useful
+#     English words or expressions worth learning.
+
+#     Message source: {source}
+#     Message: {text}
+
+#     Ignore basic everyday words and focus on useful
+#     vocabulary, natural expressions, and advanced phrases.
+
+#     Return ONLY valid JSON in this format:
+#     {{
+#         "vocabulary": [
+#             {{
+#                 "term": "make progress",
+#                 "item_type": "expression",
+#                 "meaning_ar": "يحرز تقدماً",
+#                 "definition_en": "To improve or move forward toward a goal.",
+#                 "example": "She is making progress in English.",
+#                 "synonyms": "improve, advance",
+#                 "topic": "English Learning"
+#             }}
+#         ]
+#     }}
+#     """
+
+#     try:
+#         response = client.chat(
+#             model=MODEL,
+#             messages=[{"role": "user", "content": prompt}],
+#             format="json"
+#         )
+
+#         content = response["message"]["content"]
+#         # extract_vocabulary(content, "Tutor")
+#         print("[DEBUG] Vocabulary raw response:", repr(content))
+#         content = content.strip()
+
+#         if content.startswith("```"):
+#             content = content.removeprefix("```json").removeprefix("```")
+#             content = content.removesuffix("```").strip()
+
+#         data = json.loads(content)
+       
+
+#         for item in data.get("vocabulary", []):
+#             save_vocabulary(
+#                 term=item["term"],
+#                 item_type=item["item_type"],
+#                 meaning_ar=item["meaning_ar"],
+#                 definition_en=item["definition_en"],
+#                 example=item.get("example"),
+#                 synonyms=item.get("synonyms"),
+#                 topic=item.get("topic"),
+#                 source=source
+#             )
+
+#     except Exception as e:
+#         print(f"[Vocabulary extraction error] {e}")
+
+# def extract_vocabulary(text, source):
+#     """
+#     Extract up to 5 useful English words and expressions
+#     from learner or tutor messages.
+#     """
+
+#     prompt = f"""
+#     You are an experienced English vocabulary teacher.
+
+#     Analyze the message and identify up to 5 valuable
+#     English words, collocations, phrasal verbs, and expressions
+#     that are worth learning.
+
+#     Message source: {source}
+#     Message: {text}
+
+#     SELECTION RULES:
+
+#     1. Prioritize natural expressions, phrasal verbs,
+#        collocations, idioms, and useful advanced vocabulary.
+
+#     2. Prefer expressions that learners can reuse in
+#        everyday, professional, and academic conversations.
+
+#     3. Avoid basic words such as "good", "bad", "nice",
+#        "make", "do", and "get" unless they are part of
+#        a valuable expression.
+
+#     4. Extract expressions that actually appear in the message.
+#        Do not invent vocabulary or create expressions that
+#        the speaker did not use.
+
+#     5. Avoid duplicate terms and expressions with the
+#        same meaning.
+
+#     6. Try to find 5 useful items when the message contains
+#        enough valuable vocabulary. Return fewer if necessary.
+
+#     7. Do not extract ordinary names, greetings, or
+#        unimportant everyday words.
+
+#     For every selected item, provide:
+#     - Accurate Arabic meaning.
+#     - Clear English definition.
+#     - A natural English example sentence.
+#     - Useful synonyms.
+#     - A relevant topic.
+
+#     Return ONLY valid JSON in this format:
+#     {{
+#         "vocabulary": [
+#             {{
+#                 "term": "make progress",
+#                 "item_type": "expression",
+#                 "meaning_ar": "يحرز تقدماً",
+#                 "definition_en": "To improve or move forward toward a goal.",
+#                 "example": "She is making progress in English.",
+#                 "synonyms": "improve, advance",
+#                 "topic": "English Learning"
+#             }}
+#         ]
+#     }}
+#     """
+
+#     try:
+#         response = client.chat(
+#             model=MODEL,
+#             messages=[{"role": "user", "content": prompt}],
+#             format="json"
+#         )
+
+#         content = response["message"]["content"]
+
+#         print("[DEBUG] Vocabulary raw response:", repr(content))
+
+#         content = content.strip()
+
+#         if content.startswith("```"):
+#             content = content.removeprefix("```json").removeprefix("```")
+#             content = content.removesuffix("```").strip()
+
+#         data = json.loads(content)
+
+#         for item in data.get("vocabulary", [])[:5]:
+#             save_vocabulary(
+#                 term=item["term"],
+#                 item_type=item["item_type"],
+#                 meaning_ar=item["meaning_ar"],
+#                 definition_en=item["definition_en"],
+#                 example=item.get("example"),
+#                 synonyms=item.get("synonyms"),
+#                 topic=item.get("topic"),
+#                 source=source
+#             )
+
+#     except Exception as e:
+#         print(f"[Vocabulary extraction error] {e}")
 def extract_vocabulary(text, source):
     """
-    Extract useful English words and expressions
-    from the learner or tutor messages.
+    Extract up to 5 useful English vocabulary items
+    from learner or tutor messages.
     """
 
     prompt = f"""
-    You are an English vocabulary teacher.
+    You are an experienced English vocabulary teacher.
 
-    Analyze this message and extract up to 3 useful
-    English words or expressions worth learning.
+    Analyze the message and identify up to 5 valuable
+    English vocabulary items worth learning.
 
     Message source: {source}
     Message: {text}
 
-    Ignore basic everyday words and focus on useful
-    vocabulary, natural expressions, and advanced phrases.
+    SELECTION RULES:
+
+    1. Extract only vocabulary that actually appears
+       in the message. Never invent terms.
+
+    2. Select from these five item types ONLY:
+       - word
+       - expression
+       - phrasal verb
+       - idiom
+       - collocation
+
+    3. Do not classify every multi-word item as an expression.
+       Use the most accurate category.
+
+    4. Provide the grammatical class:
+       noun, verb, adjective, adverb, noun phrase,
+       verb phrase, adjective phrase, etc.
+
+    5. Provide both Arabic and English meanings.
+
+    6. Provide a clear English definition.
+
+    7. Provide a natural example sentence.
+
+    8. Provide useful synonyms and a relevant topic.
+
+    9. Avoid basic words and duplicate terms.
+
+    10. Return fewer than 5 items if the message
+        does not contain enough valuable vocabulary.
 
     Return ONLY valid JSON in this format:
+
     {{
         "vocabulary": [
             {{
                 "term": "make progress",
-                "item_type": "expression",
+                "item_type": "collocation",
+                "grammatical_class": "verb phrase",
                 "meaning_ar": "يحرز تقدماً",
-                "definition_en": "To improve or move forward toward a goal.",
+                "meaning_en": "To improve or move forward",
+                "definition_en": "To develop or advance toward a goal.",
                 "example": "She is making progress in English.",
                 "synonyms": "improve, advance",
                 "topic": "English Learning"
@@ -97,20 +294,52 @@ def extract_vocabulary(text, source):
         )
 
         content = response["message"]["content"]
-        # extract_vocabulary(content, "Tutor")
+
+        print("[DEBUG] Vocabulary raw response:", repr(content))
+
+        content = content.strip()
+
+        if content.startswith("```"):
+            content = content.removeprefix("```json").removeprefix("```")
+            content = content.removesuffix("```").strip()
 
         data = json.loads(content)
 
-        for item in data.get("vocabulary", []):
+        allowed_types = {
+            "word",
+            "expression",
+            "phrasal verb",
+            "idiom",
+            "collocation",
+        }
+
+        for item in data.get("vocabulary", [])[:5]:
+
+            if item.get("item_type") not in allowed_types:
+                print(
+                    f"[Vocabulary skipped] Invalid item type: "
+                    f"{item.get('item_type')}"
+                )
+                continue
+
+            if not all(
+                item.get(field)
+                for field in ("term", "meaning_ar")
+            ):
+                print("[Vocabulary skipped] Missing required fields.")
+                continue
+
             save_vocabulary(
                 term=item["term"],
                 item_type=item["item_type"],
                 meaning_ar=item["meaning_ar"],
-                definition_en=item["definition_en"],
+                definition_en=item.get("definition_en"),
                 example=item.get("example"),
                 synonyms=item.get("synonyms"),
                 topic=item.get("topic"),
-                source=source
+                source=source,
+                grammatical_class=item.get("grammatical_class"),
+                meaning_en=item.get("meaning_en"),
             )
 
     except Exception as e:
@@ -724,7 +953,7 @@ if startup_review_id is not None:
 
         print(f'\nYour pending sentence:\n"{pending_review[1]}"')
 
-        print("\n👉 Type 'g' to continue your review.")
+        print("\n👉 Type 'resume review' to continue your review.")
         print("Your English journey continues one step at a time!")
         print("=" * 60)
     else:
