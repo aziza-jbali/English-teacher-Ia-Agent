@@ -226,61 +226,144 @@ def extract_vocabulary(text, source):
     from learner or tutor messages.
     """
 
+    # prompt = f"""
+    # You are an experienced English vocabulary teacher.
+
+    # Analyze the message and identify up to 5 valuable
+    # English vocabulary items worth learning.
+
+    # Message source: {source}
+    # Message: {text}
+
+    # SELECTION RULES:
+
+    # 1. Extract only vocabulary that actually appears
+    #    in the message. Never invent terms.
+
+    # 2. Select from these five item types ONLY:
+    #    - word
+    #    - expression
+    #    - phrasal verb
+    #    - idiom
+    #    - collocation
+
+    # 3. Do not classify every multi-word item as an expression.
+    #    Use the most accurate category.
+
+    # 4. Provide the grammatical class:
+    #    noun, verb, adjective, adverb, noun phrase,
+    #    verb phrase, adjective phrase, etc.
+
+    # 5. Provide both Arabic and English meanings.
+
+    # 6. Provide a clear English definition.
+
+    # 7. Provide a natural example sentence.
+
+    # 8. Provide useful synonyms and a relevant topic.
+
+    # 9. Avoid basic words and duplicate terms.
+
+    # 10. Return fewer than 5 items if the message
+    #     does not contain enough valuable vocabulary.
+
+    # Return ONLY valid JSON in this format:
+
+    # {{
+    #     "vocabulary": [
+    #         {{
+    #             "term": "make progress",
+    #             "item_type": "collocation",
+    #             "grammatical_class": "verb phrase",
+    #             "meaning_ar": "يحرز تقدماً",
+    #             "meaning_en": "To improve or move forward",
+    #             "definition_en": "To develop or advance toward a goal.",
+    #             "example": "She is making progress in English.",
+    #             "synonyms": "improve, advance",
+    #             "topic": "English Learning"
+    #         }}
+    #     ]
+    # }}
+    # """
     prompt = f"""
     You are an experienced English vocabulary teacher.
-
-    Analyze the message and identify up to 5 valuable
-    English vocabulary items worth learning.
+    Your task is to identify genuinely useful vocabulary
+    that helps an English learner improve their language.
 
     Message source: {source}
     Message: {text}
 
-    SELECTION RULES:
+    STRICT SELECTION RULES:
 
     1. Extract only vocabulary that actually appears
        in the message. Never invent terms.
 
-    2. Select from these five item types ONLY:
+    2. Prioritize:
+       - Intermediate and advanced vocabulary.
+       - Useful phrasal verbs.
+       - Common and meaningful collocations.
+       - Idioms and figurative expressions.
+       - Natural expressions useful in real conversations.
+       - Technical or professional vocabulary.
+
+    3. DO NOT extract basic or obvious language, including:
+       - Greetings: hello, hi, hey there, good morning.
+       - Simple polite expressions: thank you, please, you're welcome.
+       - Basic everyday words: good, nice, happy, sad, big, small.
+       - Simple conversational phrases: how are you, see you later.
+       - Basic words that an English learner is very likely
+         to know already.
+
+    4. Do not save a word or expression simply because
+       it appears in the message.
+       It must have genuine learning value.
+
+    5. Prefer vocabulary at approximately B1 level or above.
+       However, a lower-level word may be selected if it has
+       important technical, professional, or contextual value.
+
+    6. Do not classify every multi-word item as an expression.
+       Use the most accurate category.
+
+    7. Select from these five item types ONLY:
        - word
        - expression
        - phrasal verb
        - idiom
        - collocation
 
-    3. Do not classify every multi-word item as an expression.
-       Use the most accurate category.
-
-    4. Provide the grammatical class:
+    8. Provide the grammatical class:
        noun, verb, adjective, adverb, noun phrase,
        verb phrase, adjective phrase, etc.
 
-    5. Provide both Arabic and English meanings.
+    9. Provide both Arabic and English meanings.
 
-    6. Provide a clear English definition.
+    10. Provide a clear English definition.
 
-    7. Provide a natural example sentence.
+    11. Provide a natural example sentence.
 
-    8. Provide useful synonyms and a relevant topic.
+    12. Provide useful synonyms and a relevant topic.
 
-    9. Avoid basic words and duplicate terms.
+    13. Avoid duplicate terms and basic vocabulary.
 
-    10. Return fewer than 5 items if the message
-        does not contain enough valuable vocabulary.
+    14. Return fewer than 5 items if necessary.
+        If the message contains no genuinely useful vocabulary,
+        return an empty vocabulary array.
 
     Return ONLY valid JSON in this format:
 
     {{
         "vocabulary": [
             {{
-                "term": "make progress",
+                "term": "overcome obstacles",
                 "item_type": "collocation",
                 "grammatical_class": "verb phrase",
-                "meaning_ar": "يحرز تقدماً",
-                "meaning_en": "To improve or move forward",
-                "definition_en": "To develop or advance toward a goal.",
-                "example": "She is making progress in English.",
-                "synonyms": "improve, advance",
-                "topic": "English Learning"
+                "meaning_ar": "التغلب على العقبات",
+                "meaning_en": "To successfully deal with difficulties",
+                "definition_en": "To succeed in dealing with problems or challenges.",
+                "example": "She managed to overcome several obstacles.",
+                "synonyms": "surmount difficulties, get past challenges",
+                "topic": "Personal Development"
             }}
         ]
     }}
@@ -315,6 +398,21 @@ def extract_vocabulary(text, source):
 
         for item in data.get("vocabulary", [])[:5]:
 
+                    vocabulary = data.get("vocabulary", [])
+
+        if not isinstance(vocabulary, list):
+            print("[Vocabulary skipped] Invalid vocabulary format.")
+            return
+
+        for item in vocabulary[:5]:
+
+            # Make sure each item is a dictionary
+            if not isinstance(item, dict):
+                print(
+                    f"[Vocabulary skipped] Invalid item structure: {item!r}"
+                )
+                continue
+
             if item.get("item_type") not in allowed_types:
                 print(
                     f"[Vocabulary skipped] Invalid item type: "
@@ -341,8 +439,8 @@ def extract_vocabulary(text, source):
                 grammatical_class=item.get("grammatical_class"),
                 meaning_en=item.get("meaning_en"),
             )
-
     except Exception as e:
+        
         print(f"[Vocabulary extraction error] {e}")
 # ============================================================
 # 2. PERSISTENT REVIEW STATE
@@ -1264,7 +1362,24 @@ while True:
             mistake = detect_english_mistake(message)
             if mistake:
                 save_mistake_if_new(mistake)
+                # Phase 4.1 — Display vocabulary progress
+        vocabulary_items = get_vocabulary()
+        vocabulary_count = len(vocabulary_items)
 
+        print("\n" + "=" * 45)
+        print("VOCABULARY PROGRESS")
+        print("=" * 45)
+
+        print(
+            f"You have learned {vocabulary_count} "
+            "words and expressions so far."
+        )
+
+        print(
+            "Would you like to practice remembering them?"
+        )
+
+        print("=" * 45)
     except Exception as error:
         print("An error occurred:", error)
         print("Check your Ollama Cloud connection, model, and database.")
