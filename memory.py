@@ -1722,7 +1722,81 @@ def cosine_similarity(vector_a, vector_b):
 
     return dot_product / (norm_a * norm_b)
 
+def search_semantic_vocabulary(query, limit=5):
+    """
+    Search vocabulary_items using semantic similarity.
 
+    Generates an embedding for the query, compares it with
+    stored vocabulary embeddings, and returns the closest items.
+    """
+
+    if not query or not query.strip():
+        return []
+
+    query_embedding = generate_embedding(query.strip())
+
+    with get_connection() as connection:
+        rows = connection.execute(f"""
+            SELECT
+                {_VOCABULARY_COLUMNS},
+                embedding,
+                embedding_model
+            FROM vocabulary_items
+            WHERE embedding IS NOT NULL
+              AND embedding_model = ?
+        """, (EMBEDDING_MODEL,)).fetchall()
+
+    matches = []
+
+    for row in rows:
+        vocabulary_data = row[:-2]
+        stored_embedding = row[-2]
+        stored_model = row[-1]
+
+        if stored_model != EMBEDDING_MODEL:
+            continue
+
+        try:
+            existing_embedding = json.loads(stored_embedding)
+
+            similarity = cosine_similarity(
+                query_embedding,
+                existing_embedding
+            )
+
+            if similarity is None:
+                continue
+
+            if similarity >= SIMILARITY_THRESHOLD:
+                item = dict(zip(
+                    [
+                        "id", "term", "item_type", "meaning_ar",
+                        "definition_en", "example", "synonyms",
+                        "topic", "source", "created_at",
+                        "mastery_status", "review_count",
+                        "correct_count", "wrong_count",
+                        "next_review_at", "last_reviewed_at",
+                        "grammatical_class", "meaning_en",
+                        "occurrence_count", "correct_streak"
+                    ],
+                    vocabulary_data
+                ))
+
+                item["similarity"] = similarity
+                matches.append(item)
+
+        except (json.JSONDecodeError, TypeError, ValueError) as error:
+            print(
+                f"[WARNING] Could not compare embedding "
+                f"for '{row[1]}': {error}"
+            )
+
+    matches.sort(
+        key=lambda item: item["similarity"],
+        reverse=True
+    )
+
+    return matches[:limit]
 def find_semantic_matches(new_embedding, connection):
     """
     Compare a new embedding with existing embeddings.
