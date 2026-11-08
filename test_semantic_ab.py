@@ -6,6 +6,208 @@ from ollama import Client
 from memory import search_semantic_vocabulary
 
 
+import re
+
+
+# def tokenize_expression(text):
+#     """Normalize text into lowercase word tokens."""
+#     return re.findall(r"\b[\w']+\b", text.lower())
+
+
+# def normalize_adaptable_pronouns(tokens):
+#     """Normalize possessive pronouns for contextual comparison."""
+
+#     possessive_pronouns = {
+#         "my", "your", "his", "her", "its", "our", "their"
+#     }
+
+#     return [
+#         "<possessive>" if token in possessive_pronouns else token
+#         for token in tokens
+#     ]
+
+
+# def contains_token_sequence(answer_tokens, expression_tokens):
+#     """Check whether an expression appears as a complete token sequence."""
+
+#     length = len(expression_tokens)
+
+#     return any(
+#         answer_tokens[i:i + length] == expression_tokens
+#         for i in range(len(answer_tokens) - length + 1)
+#     )
+
+
+# def verify_vocabulary_usage(answer, retrieved_vocabulary):
+#     """
+#     Verify retrieved vocabulary usage.
+
+#     Categories:
+#     1. Exact matches
+#     2. Adapted matches (possessive pronoun changes)
+#     3. Unused expressions
+#     """
+
+#     exact_matches = []
+#     adapted_matches = []
+#     unused_expressions = []
+
+#     answer_tokens = tokenize_expression(answer)
+
+#     for item in retrieved_vocabulary:
+
+#         term_tokens = tokenize_expression(item["term"])
+
+#         if not term_tokens:
+#             unused_expressions.append(item)
+#             continue
+
+#         # 1. Exact match
+#         if contains_token_sequence(answer_tokens, term_tokens):
+#             exact_matches.append(item)
+#             continue
+
+#         # 2. Adapted match
+#         normalized_term = normalize_adaptable_pronouns(term_tokens)
+#         normalized_answer = normalize_adaptable_pronouns(answer_tokens)
+
+#         if contains_token_sequence(
+#             normalized_answer,
+#             normalized_term
+#         ):
+#             adapted_matches.append(item)
+
+#         else:
+#             unused_expressions.append(item)
+
+#     return {
+#         "exact_matches": exact_matches,
+#         "adapted_matches": adapted_matches,
+#         "unused_expressions": unused_expressions,
+#         "total_verified": len(exact_matches) + len(adapted_matches)
+#     }
+
+import re
+
+
+def tokenize_expression(text):
+    """Normalize text into lowercase word tokens."""
+    return re.findall(r"\b[\w']+\b", text.lower())
+
+
+def deduplicate_vocabulary(items):
+    """
+    Remove exact duplicate expressions from retrieved vocabulary.
+    Keep the item with the highest similarity score.
+    """
+
+    unique = {}
+    order = []
+
+    for item in items:
+        key = tuple(tokenize_expression(item["term"]))
+
+        if not key:
+            continue
+
+        if key not in unique:
+            unique[key] = item
+            order.append(key)
+
+        elif item.get("similarity", 0) > unique[key].get("similarity", 0):
+            unique[key] = item
+
+    return [unique[key] for key in order]
+
+
+def normalize_adaptable_pronouns(tokens):
+    """Normalize possessive pronouns for contextual comparison."""
+
+    possessive_pronouns = {
+        "my", "your", "his", "her", "its", "our", "their"
+    }
+
+    return [
+        "<possessive>" if token in possessive_pronouns else token
+        for token in tokens
+    ]
+
+
+def contains_token_sequence(answer_tokens, expression_tokens):
+    """Check whether an expression appears as a complete token sequence."""
+
+    length = len(expression_tokens)
+
+    return any(
+        answer_tokens[i:i + length] == expression_tokens
+        for i in range(len(answer_tokens) - length + 1)
+    )
+
+
+def verify_vocabulary_usage(answer, retrieved_vocabulary):
+    """
+    Verify actual vocabulary usage.
+
+    EXACT MATCH:
+        Expression appears literally.
+
+    ADAPTED MATCH:
+        Expression appears with a possessive pronoun change.
+
+    UNUSED:
+        Expression does not appear.
+    """
+
+    retrieved_vocabulary = deduplicate_vocabulary(
+        retrieved_vocabulary
+    )
+
+    exact_matches = []
+    adapted_matches = []
+    unused_expressions = []
+
+    answer_tokens = tokenize_expression(answer)
+
+    normalized_answer = normalize_adaptable_pronouns(
+        answer_tokens
+    )
+
+    for item in retrieved_vocabulary:
+
+        term_tokens = tokenize_expression(item["term"])
+
+        if not term_tokens:
+            continue
+
+        # 1. Exact match
+        if contains_token_sequence(answer_tokens, term_tokens):
+            exact_matches.append(item)
+            continue
+
+        # 2. Adapted match
+        normalized_term = normalize_adaptable_pronouns(
+            term_tokens
+        )
+
+        if contains_token_sequence(
+            normalized_answer,
+            normalized_term
+        ):
+            adapted_matches.append(item)
+
+        else:
+            unused_expressions.append(item)
+
+    return {
+        "exact_matches": exact_matches,
+        "adapted_matches": adapted_matches,
+        "unused_expressions": unused_expressions,
+        "total_verified": (
+            len(exact_matches) + len(adapted_matches)
+        ),
+        "total_unique_retrieved": len(retrieved_vocabulary)
+    }
+
 # --------------------------------------------------
 # 1. Configuration — same Ollama Cloud setup
 # --------------------------------------------------
@@ -134,10 +336,14 @@ REVIEW CHOICE
 #     "I want to improve my communication skills because "
 #     "I sometimes find it difficult to explain my ideas clearly."
 # )
+# USER_MESSAGE = (
+#     "When I present a proposal at work, people sometimes seem "
+#     "confused about what I mean. What can I do to make my "
+#     "explanations easier to follow?"
+# )
 USER_MESSAGE = (
-    "When I present a proposal at work, people sometimes seem "
-    "confused about what I mean. What can I do to make my "
-    "explanations easier to follow?"
+    "	Sometimes I struggle to express my opinions when discussing problems with colleagues. How can I improve?"
+    
 )
 
 
@@ -145,18 +351,28 @@ USER_MESSAGE = (
 # 4. Retrieve semantic vocabulary from learner memory
 # --------------------------------------------------
 
+# results = search_semantic_vocabulary(USER_MESSAGE, limit=5)
+
 results = search_semantic_vocabulary(USER_MESSAGE, limit=5)
 
+results = deduplicate_vocabulary(results)
 if not results:
     raise RuntimeError(
         "No semantic vocabulary was retrieved. "
         "Check your vocabulary database and embeddings."
     )
 
+# lines = [
+#     "RELEVANT VOCABULARY FROM THE LEARNER'S MEMORY:",
+#     "Use these expressions naturally when relevant.",
+#     "Do not force them into the answer."
+# ]
 lines = [
     "RELEVANT VOCABULARY FROM THE LEARNER'S MEMORY:",
-    "Use these expressions naturally when relevant.",
-    "Do not force them into the answer."
+    "These expressions were previously learned by the user.",
+    "Try to incorporate at least one expression naturally "
+    "when answering, if it fits the context.",
+    "Do not use an expression if it sounds unnatural."
 ]
 
 for item in results:
@@ -231,19 +447,140 @@ response_b = client.chat(
 answer_b = response_b["message"]["content"]
 print(answer_b)
 
+# --------------------------------------------------
+# 7.1 Verify actual vocabulary usage
+# --------------------------------------------------
+# --------------------------------------------------
+# 7.1 Verify actual vocabulary usage in A and B
+# --------------------------------------------------
+
+verification_a = verify_vocabulary_usage(answer_a, results)
+verification_b = verify_vocabulary_usage(answer_b, results)
+
+
+def print_verification_report(label, verification):
+
+    print("\n" + "=" * 60)
+    print(label)
+    print("=" * 60)
+
+    print("\nEXACT MATCHES:")
+
+    for item in verification["exact_matches"]:
+        print(
+            f"  [EXACT] {item['term']} "
+            f"(similarity: {item['similarity']:.3f})"
+        )
+
+    print("\nADAPTED MATCHES:")
+
+    for item in verification["adapted_matches"]:
+        print(
+            f"  [ADAPTED] {item['term']} "
+            f"(similarity: {item['similarity']:.3f})"
+        )
+
+    print("\nUNUSED EXPRESSIONS:")
+
+    for item in verification["unused_expressions"]:
+        print(
+            f"  [UNUSED] {item['term']} "
+            f"(similarity: {item['similarity']:.3f})"
+        )
+
+    print("\n" + "-" * 60)
+
+    print("Total retrieved expressions:", 
+          len(results))
+
+    print("Exact matches:",
+          len(verification["exact_matches"]))
+
+    print("Adapted matches:",
+          len(verification["adapted_matches"]))
+
+    print("Unused expressions:",
+          len(verification["unused_expressions"]))
+
+    print("Total verified expressions:",
+          verification["total_verified"])
+
+    print("=" * 60)
+
+
+print_verification_report(
+    "A — VOCABULARY USAGE WITHOUT SEMANTIC MEMORY",
+    verification_a
+)
+
+print_verification_report(
+    "B — VOCABULARY USAGE WITH SEMANTIC MEMORY",
+    verification_b
+)
 
 # --------------------------------------------------
 # 8. Final comparison
 # --------------------------------------------------
 
+# --------------------------------------------------
+# 8. Final A/B comparison
+# --------------------------------------------------
+
 print("\n\n" + "=" * 60)
-print("A/B TEST COMPLETED")
+print("A/B SEMANTIC VOCABULARY COMPARISON")
 print("=" * 60)
 
-print("Same model:", MODEL)
+for item in results:
+
+    term = item["term"]
+
+    def get_status(verification, term):
+
+        if any(
+            x["term"] == term
+            for x in verification["exact_matches"]
+        ):
+            return "EXACT MATCH"
+
+        if any(
+            x["term"] == term
+            for x in verification["adapted_matches"]
+        ):
+            return "ADAPTED MATCH"
+
+        return "NOT USED"
+
+    status_a = get_status(verification_a, term)
+    status_b = get_status(verification_b, term)
+
+    print(f"\nExpression: {term}")
+    print(f"Without memory (A): {status_a}")
+    print(f"With memory (B):    {status_b}")
+
+print("\n" + "=" * 60)
+print("FINAL RESULTS")
+print("=" * 60)
+
+print(
+    "Verified without memory (A):",
+    verification_a["total_verified"]
+)
+
+print(
+    "Verified with memory (B):",
+    verification_b["total_verified"]
+)
+
+print(
+    "Vocabulary retrieved from database:",
+    len(results)
+)
+
+print("\nSame model:", MODEL)
 print("Same user message:", USER_MESSAGE)
-print("Semantic memory included in B:", True)
+print("Semantic memory included in B: True")
 print("Database modified by this test: No")
 print("Vocabulary extraction performed: No")
-print("\nCompare A and B to identify expressions from")
-print("the retrieved vocabulary that Gemma actually used.")
+
+print("\nA/B TEST COMPLETED")
+print("=" * 60)
