@@ -24,7 +24,10 @@ from .types import BaseModel, OptionalNullable, UNSET, interactions
 from .utils import get_security_from_env, response_helpers
 from .utils.eventstreaming import AsyncStream, Stream
 from .utils.unmarshal_json_response import unmarshal_json_response
-import httpx
+try:
+    import httpx
+except ImportError:
+    import httpx2 as httpx
 from typing import Any, Dict, List, Literal, Mapping, Optional, Union, cast, overload
 
 
@@ -109,7 +112,7 @@ class Interactions(BaseSDK):
             (Unicode codepoints) and can only contain lowercase letters, numeric
             characters, underscores, and dashes. International characters are allowed.
             Label values are optional. Label keys must start with a letter.
-        :param model: The model that will complete your prompt.\n\nSee [models](https://ai.google.dev/gemini-api/docs/models) for additional details.
+        :param model: The model that will complete your prompt.\n\nSee [models](https://aistudio.google.com/docs/models) for additional details.
         :param previous_interaction_id: The ID of the previous interaction, if any.
         :param response_format: Enforces that the generated response is a JSON object that complies with
             the JSON schema specified in this field.
@@ -177,7 +180,7 @@ class Interactions(BaseSDK):
             (Unicode codepoints) and can only contain lowercase letters, numeric
             characters, underscores, and dashes. International characters are allowed.
             Label values are optional. Label keys must start with a letter.
-        :param model: The model that will complete your prompt.\n\nSee [models](https://ai.google.dev/gemini-api/docs/models) for additional details.
+        :param model: The model that will complete your prompt.\n\nSee [models](https://aistudio.google.com/docs/models) for additional details.
         :param previous_interaction_id: The ID of the previous interaction, if any.
         :param response_format: Enforces that the generated response is a JSON object that complies with
             the JSON schema specified in this field.
@@ -362,7 +365,7 @@ class Interactions(BaseSDK):
             (Unicode codepoints) and can only contain lowercase letters, numeric
             characters, underscores, and dashes. International characters are allowed.
             Label values are optional. Label keys must start with a letter.
-        :param model: The model that will complete your prompt.\n\nSee [models](https://ai.google.dev/gemini-api/docs/models) for additional details.
+        :param model: The model that will complete your prompt.\n\nSee [models](https://aistudio.google.com/docs/models) for additional details.
         :param previous_interaction_id: The ID of the previous interaction, if any.
         :param response_format: Enforces that the generated response is a JSON object that complies with
             the JSON schema specified in this field.
@@ -415,7 +418,7 @@ class Interactions(BaseSDK):
             (Unicode codepoints) and can only contain lowercase letters, numeric
             characters, underscores, and dashes. International characters are allowed.
             Label values are optional. Label keys must start with a letter.
-        :param model: The model that will complete your prompt.\n\nSee [models](https://ai.google.dev/gemini-api/docs/models) for additional details.
+        :param model: The model that will complete your prompt.\n\nSee [models](https://aistudio.google.com/docs/models) for additional details.
         :param previous_interaction_id: The ID of the previous interaction, if any.
         :param response_format: Enforces that the generated response is a JSON object that complies with
             the JSON schema specified in this field.
@@ -1384,7 +1387,7 @@ class AsyncInteractions(AsyncBaseSDK):
             (Unicode codepoints) and can only contain lowercase letters, numeric
             characters, underscores, and dashes. International characters are allowed.
             Label values are optional. Label keys must start with a letter.
-        :param model: The model that will complete your prompt.\n\nSee [models](https://ai.google.dev/gemini-api/docs/models) for additional details.
+        :param model: The model that will complete your prompt.\n\nSee [models](https://aistudio.google.com/docs/models) for additional details.
         :param previous_interaction_id: The ID of the previous interaction, if any.
         :param response_format: Enforces that the generated response is a JSON object that complies with
             the JSON schema specified in this field.
@@ -1452,7 +1455,7 @@ class AsyncInteractions(AsyncBaseSDK):
             (Unicode codepoints) and can only contain lowercase letters, numeric
             characters, underscores, and dashes. International characters are allowed.
             Label values are optional. Label keys must start with a letter.
-        :param model: The model that will complete your prompt.\n\nSee [models](https://ai.google.dev/gemini-api/docs/models) for additional details.
+        :param model: The model that will complete your prompt.\n\nSee [models](https://aistudio.google.com/docs/models) for additional details.
         :param previous_interaction_id: The ID of the previous interaction, if any.
         :param response_format: Enforces that the generated response is a JSON object that complies with
             the JSON schema specified in this field.
@@ -1637,7 +1640,7 @@ class AsyncInteractions(AsyncBaseSDK):
             (Unicode codepoints) and can only contain lowercase letters, numeric
             characters, underscores, and dashes. International characters are allowed.
             Label values are optional. Label keys must start with a letter.
-        :param model: The model that will complete your prompt.\n\nSee [models](https://ai.google.dev/gemini-api/docs/models) for additional details.
+        :param model: The model that will complete your prompt.\n\nSee [models](https://aistudio.google.com/docs/models) for additional details.
         :param previous_interaction_id: The ID of the previous interaction, if any.
         :param response_format: Enforces that the generated response is a JSON object that complies with
             the JSON schema specified in this field.
@@ -1690,7 +1693,7 @@ class AsyncInteractions(AsyncBaseSDK):
             (Unicode codepoints) and can only contain lowercase letters, numeric
             characters, underscores, and dashes. International characters are allowed.
             Label values are optional. Label keys must start with a letter.
-        :param model: The model that will complete your prompt.\n\nSee [models](https://ai.google.dev/gemini-api/docs/models) for additional details.
+        :param model: The model that will complete your prompt.\n\nSee [models](https://aistudio.google.com/docs/models) for additional details.
         :param previous_interaction_id: The ID of the previous interaction, if any.
         :param response_format: Enforces that the generated response is a JSON object that complies with
             the JSON schema specified in this field.
