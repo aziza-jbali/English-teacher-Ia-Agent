@@ -1096,6 +1096,7 @@ from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types  # add this import at the top of the file
 
 # Store the database beside this file.
 DB_PATH = Path(__file__).parent / "learner_memory.db"
@@ -1683,7 +1684,13 @@ def _get_gemini_client():
         if not api_key:
             raise ValueError("GEMINI_API_KEY was not found in .env")
 
-        _gemini_client = genai.Client(api_key=api_key)
+        # _gemini_client = genai.Client(api_key=api_key)
+        
+
+        _gemini_client = genai.Client(
+                api_key=api_key,
+                http_options=types.HttpOptions(timeout=60_000),  # 60 seconds
+            )
 
     return _gemini_client
 
