@@ -1111,6 +1111,123 @@ EMBEDDING_MODEL = "gemini-embedding-001"
 SIMILARITY_THRESHOLD = 0.65
 STRONG_SIMILARITY_THRESHOLD = 0.85
 
+
+TOPIC_MAPPING = {
+    "Communication": [
+        "Communication",
+        "Communication Skills",
+        "General Communication",
+    ],
+
+    "Professional Communication": [
+        "Professional Communication",
+        "Workplace Communication",
+        "Business/Professional Communication",
+        "Polite Communication",
+        "Business Etiquette",
+    ],
+
+    "Personal Development": [
+        "Personal Development",
+        "Personal Growth",
+        "Ambition",
+        "Goals and Ambition",
+    ],
+
+    "Professional Development": [
+        "Professional Development",
+        "Professionalism",
+        "Professional Training",
+        "Soft Skills",
+    ],
+
+    "Work & Career": [
+        "Work & Employment",
+        "Work and Professional Life",
+        "Work and Career",
+        "Career/Employment",
+        "Career Development",
+    ],
+
+    "Psychology & Well-being": [
+        "Psychology",
+        "Mental Health",
+        "Well-being",
+        "Emotions/Psychology",
+        "Emotions & Psychology",
+        "Emotions / Stress",
+        "Workplace Stress",
+        "Workplace/Psychology",
+        "Psychology / Personal Growth",
+        "Psychology and Personal Growth",
+    ],
+
+    "Professional Relationships": [
+        "Professional Relationships",
+        "Professional Relations",
+    ],
+
+    "Grammar & Writing": [
+        "Grammar",
+        "Grammar & Writing",
+        "Writing",
+    ],
+
+    "Productivity": [
+        "Productivity",
+        "Productivity/Management",
+        "Productivity & Learning",
+        "Time and Progress",
+    ],
+
+    "English Learning": [
+        "Language Learning",
+        "English Learning",
+        "General Language",
+        "Conversational English",
+    ],
+
+    "Business & Management": [
+        "Business and Management",
+        "Finance & Management",
+        "Business & Research",
+    ],
+
+    "Daily Life": [
+        "Daily Life",
+        "Daily Conversation",
+        "Lifestyle",
+        "Greetings",
+    ],
+
+    "Technology": [
+        "Technology",
+        "General Movement / Technology",
+    ],
+}
+
+
+
+def normalize_topic(topic):
+    """Return the canonical topic name without modifying the database."""
+
+    if not topic or not topic.strip():
+        return None
+
+    normalized = topic.strip().casefold()
+
+    for canonical_topic, aliases in TOPIC_MAPPING.items():
+        if normalized == canonical_topic.casefold():
+            return canonical_topic
+
+        for alias in aliases:
+            if normalized == alias.casefold():
+                return canonical_topic
+
+    # Preserve unknown topics instead of assigning them incorrectly.
+    return topic.strip()
+
+
 ALLOWED_ITEM_TYPES = (
     "word",
     "expression",
