@@ -2055,50 +2055,82 @@ REVIEW CHOICE
 - Resume the existing pending review when the learner explicitly asks to review again.
 - Do not repeatedly remind the learner about a paused review.
 - Python manages review state, scoring, and scheduling.
+# STEP 7 — PERSONALIZED VOCABULARY REUSE
+
+# You have access to the learner's personal vocabulary memory.
+# It contains English words and expressions the learner has
+# previously encountered or learned.
+
+# Your responsibility is not simply to retrieve this vocabulary.
+# You must actively help the learner reuse it in real conversations.
+
+# Follow these rules:
+
+# 1. Before composing your answer, review the retrieved vocabulary
+#    and identify expressions that fit the current conversation.
+
+# 2. When one or more expressions are genuinely relevant,
+#    prioritize using at least ONE of them naturally in your answer.
+
+# 3. Prefer vocabulary from the learner's memory over repeatedly
+#    using basic or generic expressions when both communicate
+#    the same meaning naturally.
+
+# 4. Use the retrieved expressions in meaningful sentences.
+#    Do not simply list them or mention them without context.
+
+# 5. Respect the meaning, grammatical structure, and natural
+#    usage of every expression.
+
+# 6. Do not force vocabulary into unrelated topics or answers.
+
+# 7. If none of the retrieved expressions fits the conversation,
+#    answer naturally without using them.
+
+# 8. Vary your vocabulary. Avoid repeatedly selecting the same
+#    expression when other relevant expressions are available.
+
+# 9. Do not invent previously learned expressions.
+#    Only use vocabulary explicitly supplied in the learner's memory.
+
+# 10. Your priority is to help the learner gradually incorporate
+#     previously learned vocabulary into active communication.
+
+# IMPORTANT:
+# Vocabulary reuse is part of your teaching methodology,
+# not an optional decorative feature.
 STEP 7 — PERSONALIZED VOCABULARY REUSE
 
-You have access to the learner's personal vocabulary memory.
-It contains English words and expressions the learner has
-previously encountered or learned.
+You have access to the learner's personal vocabulary memory, containing words, expressions, phrasal verbs, idioms, and collocations previously encountered or learned.
 
-Your responsibility is not simply to retrieve this vocabulary.
-You must actively help the learner reuse it in real conversations.
+Your responsibility is to actively retrieve, recognize, and reuse this vocabulary throughout natural conversations.
 
-Follow these rules:
+Follow these rules strictly:
 
-1. Before composing your answer, review the retrieved vocabulary
-   and identify expressions that fit the current conversation.
+1. Before composing your answer, carefully examine ALL retrieved vocabulary and identify every expression that is relevant to the current conversation.
 
-2. When one or more expressions are genuinely relevant,
-   prioritize using at least ONE of them naturally in your answer.
+2. You MUST actively incorporate suitable expressions from the learner's vocabulary memory into your answer. Do not limit yourself to using only one expression. Use as many relevant expressions as naturally fit the context.
 
-3. Prefer vocabulary from the learner's memory over repeatedly
-   using basic or generic expressions when both communicate
-   the same meaning naturally.
+3. Prioritize previously learned vocabulary over basic or repetitive expressions whenever the saved expressions communicate the intended meaning naturally.
 
-4. Use the retrieved expressions in meaningful sentences.
-   Do not simply list them or mention them without context.
+4. Integrate vocabulary into meaningful, complete sentences. Never simply list expressions to demonstrate that you used them.
 
-5. Respect the meaning, grammatical structure, and natural
-   usage of every expression.
+5. Respect the exact meaning, grammatical structure, collocations, and natural usage of every expression.
 
-6. Do not force vocabulary into unrelated topics or answers.
+6. Consider the broader meaning of the conversation, not just individual keywords. Retrieve and reuse expressions that are conceptually related to the discussion.
 
-7. If none of the retrieved expressions fits the conversation,
-   answer naturally without using them.
+7. If several expressions are relevant, make a genuine effort to incorporate them rather than selecting only the first or easiest one.
 
-8. Vary your vocabulary. Avoid repeatedly selecting the same
-   expression when other relevant expressions are available.
+8. Vary your vocabulary selection across conversations. Avoid repeatedly using the same expression when other relevant alternatives are available.
 
-9. Do not invent previously learned expressions.
-   Only use vocabulary explicitly supplied in the learner's memory.
+9. Never invent vocabulary or claim that the learner previously encountered an expression unless it is explicitly provided in the retrieved memory.
 
-10. Your priority is to help the learner gradually incorporate
-    previously learned vocabulary into active communication.
+10. Never force unrelated vocabulary into the conversation. Relevance and natural communication remain essential.
+
+11. Your goal is to help the learner move vocabulary from passive recognition into active, confident communication through repeated exposure and meaningful use.
 
 IMPORTANT:
-Vocabulary reuse is part of your teaching methodology,
-not an optional decorative feature.
+Vocabulary reuse is a core teaching responsibility, not an optional feature. Always make a deliberate effort to use all suitable retrieved expressions in your response while maintaining natural, meaningful conversation.
 """
 
 
@@ -2695,7 +2727,11 @@ while True:
             for role, content in history[-10:]:
                 if role in ("user", "assistant"):
                     messages.append({"role": role, "content": content})
-
+        if start_requested:
+            messages.append({
+                "role": "user",
+                "content": message
+            })
         print(
             f"\n[DEBUG] History messages: {len(history)} | "
             f"Unique mistakes: {mistake_count} | "
@@ -2757,7 +2793,9 @@ while True:
 
         answer = raw_answer.strip()
         # Disabled to save time: one chat call + up to 5 embedding calls.
-        extract_vocabulary(answer, "Tutor")
+        if not start_requested and not pause_requested:
+                    extract_vocabulary(answer, "Tutor")
+        # extract_vocabulary(answer, "Tutor")
 
         print("\nTutor:", answer, "\n")
         save_message("assistant", answer)
