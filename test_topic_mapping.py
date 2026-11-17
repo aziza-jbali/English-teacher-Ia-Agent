@@ -33,3 +33,23 @@ for topic, count in counts.items():
 
 print(f"\nTotal original topics: {len(results)}")
 print(f"Total normalized topics: {len(counts)}")
+connection = sqlite3.connect(DB_PATH)
+
+rows = connection.execute("""
+    SELECT topic, COUNT(*)
+    FROM vocabulary_items
+    GROUP BY topic
+""").fetchall()
+
+connection.close()
+
+print("\nACTUAL VOCABULARY COUNTS AFTER NORMALIZATION\n")
+
+counts = Counter()
+
+for topic, number in rows:
+    normalized = normalize_topic(topic)
+    counts[normalized] += number
+
+for topic, number in counts.most_common():
+    print(f"{topic}: {number}")
