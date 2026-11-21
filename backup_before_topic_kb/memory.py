@@ -1,0 +1,3312 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# import sqlite3
+# import os
+# import json
+# import math
+# from contextlib import contextmanager
+# from pathlib import Path
+# from datetime import datetime, timedelta
+
+# from dotenv import load_dotenv
+# from google import genai
+
+# from google.genai import types  # add this import at the top of the file
+
+# # Store the database beside this file.
+# DB_PATH = Path(__file__).parent / "learner_memory.db"
+
+# # Spaced-repetition intervals, in days.
+# REVIEW_INTERVALS = [1, 3, 7, 14, 40]
+
+# # Semantic embedding configuration.
+# EMBEDDING_MODEL = "gemini-embedding-001"
+
+# # Initial similarity thresholds.
+# SIMILARITY_THRESHOLD = 0.65
+# STRONG_SIMILARITY_THRESHOLD = 0.85
+
+
+# # TOPIC_MAPPING = {
+# #     "Communication": [
+# #         "Communication",
+# #         "Communication Skills",
+# #         "General Communication",
+# #     ],
+
+# #     "Professional Communication": [
+# #         "Professional Communication",
+# #         "Workplace Communication",
+# #         "Business/Professional Communication",
+# #         "Polite Communication",
+# #         "Business Etiquette",
+# #     ],
+
+# #     "Personal Development": [
+# #         "Personal Development",
+# #         "Personal Growth",
+# #         "Ambition",
+# #         "Goals and Ambition",
+# #     ],
+
+# #     "Professional Development": [
+# #         "Professional Development",
+# #         "Professionalism",
+# #         "Professional Training",
+# #         "Soft Skills",
+# #     ],
+
+# #     "Work & Career": [
+# #         "Work & Employment",
+# #         "Work and Professional Life",
+# #         "Work and Career",
+# #         "Career/Employment",
+# #         "Career Development",
+# #     ],
+
+# #     "Psychology & Well-being": [
+# #         "Psychology",
+# #         "Mental Health",
+# #         "Well-being",
+# #         "Emotions/Psychology",
+# #         "Emotions & Psychology",
+# #         "Emotions / Stress",
+# #         "Workplace Stress",
+# #         "Workplace/Psychology",
+# #         "Psychology / Personal Growth",
+# #         "Psychology and Personal Growth",
+# #     ],
+
+# #     "Professional Relationships": [
+# #         "Professional Relationships",
+# #         "Professional Relations",
+# #     ],
+
+# #     "Grammar & Writing": [
+# #         "Grammar",
+# #         "Grammar & Writing",
+# #         "Writing",
+# #     ],
+
+# #     "Productivity": [
+# #         "Productivity",
+# #         "Productivity/Management",
+# #         "Productivity & Learning",
+# #         "Time and Progress",
+# #     ],
+
+# #     "English Learning": [
+# #         "Language Learning",
+# #         "English Learning",
+# #         "General Language",
+# #         "Conversational English",
+# #     ],
+
+# #     "Business & Management": [
+# #         "Business and Management",
+# #         "Finance & Management",
+# #         "Business & Research",
+# #     ],
+
+# #     "Daily Life": [
+# #         "Daily Life",
+# #         "Daily Conversation",
+# #         "Lifestyle",
+# #         "Greetings",
+# #     ],
+
+# #     "Technology": [
+# #         "Technology",
+# #         "General Movement / Technology",
+# #     ],
+# # }
+
+
+
+# TOPIC_MAPPING = {
+#     "Communication": [
+#         "Communication Skills",
+#         "General Communication",
+#     ],
+
+#     "Professional Communication": [
+#         "Workplace Communication",
+#         "Business/Professional Communication",
+#         "Polite Communication",
+#         "Business Etiquette",
+#     ],
+
+#     "Personal Development": [
+#         "Personal Growth",
+#     ],
+
+#     "Goals & Ambition": [
+#         "Goals and Ambition",
+#     ],
+
+#     "Professional Development": [
+#         "Professional Training",
+#     ],
+
+#     "Professionalism": [],
+
+#     "Work & Career": [
+#         "Work & Employment",
+#         "Work and Professional Life",
+#         "Work and Career",
+#         "Career/Employment",
+#         "Career Development",
+#     ],
+
+#     "Psychology & Well-being": [
+#         "Psychology",
+#         "Mental Health",
+#         "Well-being",
+#         "Emotions/Psychology",
+#         "Emotions & Psychology",
+#     ],
+
+#     "Psychology & Personal Growth": [
+#         "Psychology / Personal Growth",
+#         "Psychology and Personal Growth",
+#     ],
+
+#     "Workplace Stress": [
+#         "Workplace/Psychology",
+#     ],
+
+#     "Professional Relationships": [
+#         "Professional Relations",
+#     ],
+
+#     "Grammar & Writing": [
+#         "Grammar",
+#         "Writing",
+#     ],
+
+#     "Productivity": [
+#         "Productivity/Management",
+#     ],
+
+#     "Productivity & Learning": [],
+
+#     "English Learning": [
+#         "Language Learning",
+#         "General Language",
+#     ],
+
+#     "Business & Management": [
+#         "Business and Management",
+#     ],
+
+#     "Business & Research": [],
+
+#     "Daily Conversation": [],
+
+#     "Daily Life": [
+#         "Lifestyle",
+#     ],
+
+#     "General Movement / Technology": [],
+
+#     "Technology": [],
+# }
+
+
+
+# def normalize_topic(topic):
+#     """Return the canonical topic name without modifying the database."""
+
+#     if not topic or not topic.strip():
+#         return None
+
+#     normalized = topic.strip().casefold()
+
+#     for canonical_topic, aliases in TOPIC_MAPPING.items():
+#         if normalized == canonical_topic.casefold():
+#             return canonical_topic
+
+#         for alias in aliases:
+#             if normalized == alias.casefold():
+#                 return canonical_topic
+
+#     # Preserve unknown topics instead of assigning them incorrectly.
+#     return topic.strip()
+
+
+# ALLOWED_ITEM_TYPES = (
+#     "word",
+#     "expression",
+#     "phrasal verb",
+#     "idiom",
+#     "collocation",
+# )
+
+
+# @contextmanager
+# def get_connection():
+#     """
+#     Open a SQLite connection, commit on success, roll back on error,
+#     and ALWAYS close it.
+
+#     (Plain `with sqlite3.connect(...)` commits but never closes the
+#     connection, which can leave the database file locked.)
+#     """
+
+#     connection = sqlite3.connect(DB_PATH)
+
+#     try:
+#         yield connection
+#         connection.commit()
+#     except Exception:
+#         connection.rollback()
+#         raise
+#     finally:
+#         connection.close()
+
+
+# def init_db():
+#     """Create the tables and safely update an existing database."""
+
+#     with get_connection() as connection:
+
+#         # Table for English mistakes.
+#         connection.execute("""
+#             CREATE TABLE IF NOT EXISTS mistakes (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 original_sentence TEXT NOT NULL,
+#                 correction TEXT NOT NULL,
+#                 explanation TEXT,
+#                 category TEXT,
+#                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
+#             )
+#         """)
+
+#         # Legacy table for English vocabulary and expressions.
+#         connection.execute("""
+#             CREATE TABLE IF NOT EXISTS vocabulary (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 term TEXT NOT NULL,
+#                 item_type TEXT NOT NULL
+#                     CHECK (item_type IN ('word', 'expression')),
+#                 meaning_ar TEXT NOT NULL,
+#                 definition_en TEXT NOT NULL,
+#                 example TEXT,
+#                 synonyms TEXT,
+#                 topic TEXT,
+#                 source TEXT,
+#                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+#                 mastery_status TEXT NOT NULL DEFAULT 'Learning'
+#                     CHECK (
+#                         mastery_status IN (
+#                             'Learning',
+#                             'Review',
+#                             'Mastered'
+#                         )
+#                     ),
+#                 review_count INTEGER NOT NULL DEFAULT 0,
+#                 correct_count INTEGER NOT NULL DEFAULT 0,
+#                 wrong_count INTEGER NOT NULL DEFAULT 0,
+#                 next_review_at TEXT,
+#                 last_reviewed_at TEXT
+#             )
+#         """)
+
+#         # Unified table for all vocabulary items.
+#         connection.execute("""
+#             CREATE TABLE IF NOT EXISTS vocabulary_items (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+#                 term TEXT NOT NULL COLLATE NOCASE,
+#                 item_type TEXT NOT NULL CHECK (
+#                     item_type IN (
+#                         'word',
+#                         'expression',
+#                         'phrasal verb',
+#                         'idiom',
+#                         'collocation'
+#                     )
+#                 ),
+
+#                 grammatical_class TEXT,
+#                 meaning_ar TEXT NOT NULL,
+#                 meaning_en TEXT,
+#                 definition_en TEXT,
+#                 example TEXT,
+#                 synonyms TEXT,
+#                 topic TEXT,
+#                 source TEXT,
+
+#                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+#                 updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+#                 first_seen_at TEXT DEFAULT CURRENT_TIMESTAMP,
+#                 last_seen_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+#                 occurrence_count INTEGER NOT NULL DEFAULT 1,
+
+#                 mastery_status TEXT NOT NULL DEFAULT 'Learning'
+#                     CHECK (
+#                         mastery_status IN (
+#                             'Learning',
+#                             'Review',
+#                             'Mastered'
+#                         )
+#                     ),
+
+#                 review_count INTEGER NOT NULL DEFAULT 0,
+#                 correct_count INTEGER NOT NULL DEFAULT 0,
+#                 wrong_count INTEGER NOT NULL DEFAULT 0,
+#                 correct_streak INTEGER NOT NULL DEFAULT 0,
+
+#                 next_review_at TEXT,
+#                 last_reviewed_at TEXT,
+#                 mastered_at TEXT
+#             )
+#         """)
+
+#         # Table for conversation history.
+#         connection.execute("""
+#             CREATE TABLE IF NOT EXISTS conversations (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 role TEXT NOT NULL,
+#                 content TEXT NOT NULL,
+#                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
+#             )
+#         """)
+
+#         # Add Phase 3 columns to existing databases.
+#         existing_columns = {
+#             row[1]
+#             for row in connection.execute(
+#                 "PRAGMA table_info(mistakes)"
+#             ).fetchall()
+#         }
+
+#         new_columns = {
+#             "next_review_at": "TEXT",
+#             "review_count": "INTEGER NOT NULL DEFAULT 0",
+#             "correct_streak": "INTEGER NOT NULL DEFAULT 0",
+#             "correct_count": "INTEGER NOT NULL DEFAULT 0",
+#             "wrong_count": "INTEGER NOT NULL DEFAULT 0",
+#             "last_reviewed_at": "TEXT",
+#             "last_review_result": "INTEGER",
+#         }
+
+#         for column_name, column_type in new_columns.items():
+#             if column_name not in existing_columns:
+#                 connection.execute(
+#                     f"ALTER TABLE mistakes "
+#                     f"ADD COLUMN {column_name} {column_type}"
+#                 )
+
+#         # Schedule existing mistakes based on their original creation date.
+#         # Old mistakes will already be due if their review date has passed.
+#         # 'localtime' keeps the fallback consistent with the Python-written
+#         # timestamps and with the comparison used in get_due_mistakes().
+#         connection.execute("""
+#             UPDATE mistakes
+#             SET next_review_at = COALESCE(
+#                 datetime(created_at, '+1 day'),
+#                 datetime('now', 'localtime')
+#             )
+#             WHERE next_review_at IS NULL
+#         """)
+
+#         # Add embedding columns to existing vocabulary databases.
+#         vocabulary_columns = {
+#             row[1]
+#             for row in connection.execute(
+#                 "PRAGMA table_info(vocabulary_items)"
+#             ).fetchall()
+#         }
+
+#         if "embedding" not in vocabulary_columns:
+#             connection.execute("""
+#                 ALTER TABLE vocabulary_items
+#                 ADD COLUMN embedding TEXT
+#             """)
+
+#         if "embedding_model" not in vocabulary_columns:
+#             connection.execute("""
+#                 ALTER TABLE vocabulary_items
+#                 ADD COLUMN embedding_model TEXT
+#             """)
+
+#         # Store semantic relationships between vocabulary items.
+#         connection.execute("""
+#             CREATE TABLE IF NOT EXISTS semantic_relationships (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 item_id INTEGER NOT NULL,
+#                 related_item_id INTEGER NOT NULL,
+#                 similarity REAL NOT NULL,
+#                 relationship_type TEXT NOT NULL
+#                     CHECK (
+#                         relationship_type IN ('similar', 'strong')
+#                     ),
+#                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+#                 UNIQUE(item_id, related_item_id)
+#             )
+#         """)
+
+#         connection.execute("""
+#             CREATE INDEX IF NOT EXISTS
+#             idx_semantic_relationships_item
+#             ON semantic_relationships(item_id)
+#         """)
+
+#         connection.execute("""
+#             CREATE INDEX IF NOT EXISTS
+#             idx_semantic_relationships_related
+#             ON semantic_relationships(related_item_id)
+#         """)
+
+
+# # ----------------------------------------------------------------------
+# # Mistakes
+# # ----------------------------------------------------------------------
+
+# def save_mistake(original, correction, explanation, category):
+#     """Save a mistake and schedule its first review for tomorrow."""
+
+#     now = datetime.now().replace(microsecond=0)
+#     next_review = now + timedelta(days=1)
+
+#     with get_connection() as connection:
+#         cursor = connection.execute("""
+#             INSERT INTO mistakes (
+#                 original_sentence,
+#                 correction,
+#                 explanation,
+#                 category,
+#                 created_at,
+#                 next_review_at
+#             )
+#             VALUES (?, ?, ?, ?, ?, ?)
+#         """, (
+#             original,
+#             correction,
+#             explanation,
+#             category,
+#             now.isoformat(sep=" "),
+#             next_review.isoformat(sep=" "),
+#         ))
+
+#         return cursor.lastrowid
+
+
+# def get_mistakes():
+#     """
+#     Retrieve saved mistakes.
+
+#     Keeps the original six-field return format so existing tutor.py
+#     code can continue to unpack the results.
+#     """
+
+#     with get_connection() as connection:
+#         cursor = connection.execute("""
+#             SELECT
+#                 id,
+#                 original_sentence,
+#                 correction,
+#                 explanation,
+#                 category,
+#                 created_at
+#             FROM mistakes
+#             ORDER BY id
+#         """)
+
+#         return cursor.fetchall()
+
+
+# def get_due_mistakes(limit=3):
+#     """Retrieve mistakes whose scheduled review time has arrived."""
+
+#     with get_connection() as connection:
+#         cursor = connection.execute("""
+#             SELECT
+#                 id,
+#                 original_sentence,
+#                 correction,
+#                 explanation,
+#                 category,
+#                 created_at,
+#                 next_review_at,
+#                 review_count,
+#                 correct_streak,
+#                 correct_count,
+#                 wrong_count,
+#                 last_reviewed_at,
+#                 last_review_result
+#             FROM mistakes
+#             WHERE datetime(next_review_at) <= datetime('now', 'localtime')
+#             ORDER BY datetime(next_review_at) ASC, id ASC
+#             LIMIT ?
+#         """, (limit,))
+
+#         return cursor.fetchall()
+
+
+# def record_review_result(mistake_id, was_correct):
+#     """
+#     Record the result of an exercise.
+
+#     Correct answers receive increasingly longer review intervals.
+#     Incorrect answers are scheduled again for tomorrow.
+#     """
+
+#     now = datetime.now().replace(microsecond=0)
+
+#     with get_connection() as connection:
+#         row = connection.execute("""
+#             SELECT
+#                 review_count,
+#                 correct_streak,
+#                 correct_count,
+#                 wrong_count
+#             FROM mistakes
+#             WHERE id = ?
+#         """, (mistake_id,)).fetchone()
+
+#         if row is None:
+#             return False
+
+#         review_count, streak, correct_count, wrong_count = row
+
+#         review_count += 1
+
+#         if was_correct:
+#             streak += 1
+#             correct_count += 1
+
+#             # 1, 3, 7, 14, then every 40 days.
+#             interval_index = min(streak - 1, len(REVIEW_INTERVALS) - 1)
+#             interval_days = REVIEW_INTERVALS[interval_index]
+
+#         else:
+#             streak = 0
+#             wrong_count += 1
+#             interval_days = 1
+
+#         next_review = now + timedelta(days=interval_days)
+
+#         connection.execute("""
+#             UPDATE mistakes
+#             SET
+#                 review_count = ?,
+#                 correct_streak = ?,
+#                 correct_count = ?,
+#                 wrong_count = ?,
+#                 last_reviewed_at = ?,
+#                 last_review_result = ?,
+#                 next_review_at = ?
+#             WHERE id = ?
+#         """, (
+#             review_count,
+#             streak,
+#             correct_count,
+#             wrong_count,
+#             now.isoformat(sep=" "),
+#             1 if was_correct else 0,
+#             next_review.isoformat(sep=" "),
+#             mistake_id,
+#         ))
+
+#         return True
+
+
+# def get_learning_stats():
+#     """Return basic statistics about the learner's saved mistakes."""
+
+#     with get_connection() as connection:
+#         row = connection.execute("""
+#             SELECT
+#                 COUNT(*),
+#                 COALESCE(SUM(correct_count), 0),
+#                 COALESCE(SUM(wrong_count), 0),
+#                 COALESCE(SUM(
+#                     CASE
+#                         WHEN datetime(next_review_at)
+#                              <= datetime('now', 'localtime')
+#                         THEN 1
+#                         ELSE 0
+#                     END
+#                 ), 0)
+#             FROM mistakes
+#         """).fetchone()
+
+#     return {
+#         "total_mistakes": row[0],
+#         "correct_answers": row[1],
+#         "wrong_answers": row[2],
+#         "due_reviews": row[3],
+#     }
+
+
+# # ----------------------------------------------------------------------
+# # Conversation history
+# # ----------------------------------------------------------------------
+
+# def save_message(role, content):
+#     """Save one user or tutor message."""
+
+#     with get_connection() as connection:
+#         connection.execute("""
+#             INSERT INTO conversations (role, content)
+#             VALUES (?, ?)
+#         """, (role, content))
+
+
+# def get_chat_history(limit=30):
+#     """Return recent conversation messages in chronological order."""
+
+#     with get_connection() as connection:
+#         cursor = connection.execute("""
+#             SELECT role, content
+#             FROM conversations
+#             ORDER BY id DESC
+#             LIMIT ?
+#         """, (limit,))
+
+#         rows = cursor.fetchall()
+
+#     # The query returns newest first; reverse for the tutor.
+#     return list(reversed(rows))
+
+
+# # ----------------------------------------------------------------------
+# # Mistake statistics
+# # ----------------------------------------------------------------------
+
+# def get_mistake_category_stats():
+#     """Count saved mistakes using consistent, meaningful category labels."""
+
+#     category_aliases = {
+#         "grammar": "Grammar",
+#         "grammar and punctuation": "Grammar/Punctuation",
+#         "grammar/punctuation": "Grammar/Punctuation",
+#         "grammar and spelling": "Grammar/Spelling",
+#         "grammar/spelling": "Grammar/Spelling",
+#         "grammar/word order": "Grammar/Word Order",
+#         "verb tense": "Verb Tense",
+#         "punctuation": "Punctuation",
+#         "spelling": "Spelling",
+#         "vocabulary": "Vocabulary",
+#         "word choice": "Word Choice",
+#         "word_choice": "Word Choice",
+#     }
+
+#     with get_connection() as connection:
+#         rows = connection.execute("""
+#             SELECT
+#                 COALESCE(NULLIF(TRIM(category), ''), 'Uncategorized'),
+#                 COUNT(*)
+#             FROM mistakes
+#             GROUP BY COALESCE(
+#                 NULLIF(TRIM(category), ''),
+#                 'Uncategorized'
+#             )
+#         """).fetchall()
+
+#     counts = {}
+
+#     for category, count in rows:
+#         key = category.strip().lower()
+#         normalized = category_aliases.get(key, category.strip())
+#         counts[normalized] = counts.get(normalized, 0) + count
+
+#     return [
+#         {"category": category, "count": count}
+#         for category, count in sorted(
+#             counts.items(),
+#             key=lambda item: item[1],
+#             reverse=True
+#         )
+#     ]
+
+
+# def get_recurring_mistakes():
+#     """Identify recurring error patterns across different sentences."""
+
+#     with get_connection() as connection:
+#         rows = connection.execute("""
+#             SELECT original_sentence, correction, category
+#             FROM mistakes
+#             ORDER BY id
+#         """).fetchall()
+
+#     recurring = {}
+
+#     for original, correction, category in rows:
+#         original_lower = original.lower()
+#         correction_lower = correction.lower()
+#         category_lower = (category or "").lower()
+
+#         # Identify patterns using the saved category.
+#         matched_patterns = []
+
+#         if category_lower == "verb tense":
+#             matched_patterns.append("Verb Tense")
+#         elif "word order" in category_lower:
+#             matched_patterns.append("Grammar/Word Order")
+#         elif "spelling" in category_lower:
+#             matched_patterns.append("Grammar/Spelling")
+#         elif "punctuation" in category_lower:
+#             matched_patterns.append("Grammar/Punctuation")
+
+#         # Recognize common past-tense errors in different sentences.
+#         if (
+#             "yesterday" in original_lower
+#             and original_lower != correction_lower
+#         ):
+#             if "Verb Tense" not in matched_patterns:
+#                 matched_patterns.append("Verb Tense")
+
+#         for pattern in matched_patterns:
+#             if pattern not in recurring:
+#                 recurring[pattern] = {
+#                     "original": original,
+#                     "correction": correction,
+#                     "category": pattern,
+#                     "occurrences": 0,
+#                     "examples": [],
+#                 }
+
+#             recurring[pattern]["occurrences"] += 1
+
+#             if len(recurring[pattern]["examples"]) < 5:
+#                 recurring[pattern]["examples"].append({
+#                     "original": original,
+#                     "correction": correction,
+#                 })
+
+#     return [
+#         item
+#         for item in recurring.values()
+#         if item["occurrences"] > 1
+#     ]
+
+
+# # ----------------------------------------------------------------------
+# # Embeddings
+# # ----------------------------------------------------------------------
+
+# _gemini_client = None
+
+
+# def _get_gemini_client():
+#     """Create the Gemini client once and reuse it."""
+
+#     global _gemini_client
+
+#     if _gemini_client is None:
+#         load_dotenv()
+
+#         api_key = os.getenv("GEMINI_API_KEY")
+
+#         if not api_key:
+#             raise ValueError("GEMINI_API_KEY was not found in .env")
+
+#         # _gemini_client = genai.Client(api_key=api_key)
+        
+
+#         _gemini_client = genai.Client(
+#                 api_key=api_key,
+#                 http_options=types.HttpOptions(timeout=60_000),  # 60 seconds
+#             )
+
+#     return _gemini_client
+
+
+# def generate_embedding(term):
+#     """
+#     Generate an embedding for an English vocabulary item
+#     using Gemini.
+#     """
+
+#     client = _get_gemini_client()
+
+#     result = client.models.embed_content(
+#         model=EMBEDDING_MODEL,
+#         contents=term
+#     )
+
+#     return result.embeddings[0].values
+
+
+# def cosine_similarity(vector_a, vector_b):
+#     """Calculate cosine similarity between two embedding vectors."""
+
+#     if len(vector_a) != len(vector_b):
+#         return None
+
+#     dot_product = sum(
+#         a * b for a, b in zip(vector_a, vector_b)
+#     )
+
+#     norm_a = math.sqrt(sum(a * a for a in vector_a))
+#     norm_b = math.sqrt(sum(b * b for b in vector_b))
+
+#     if norm_a == 0 or norm_b == 0:
+#         return None
+
+#     return dot_product / (norm_a * norm_b)
+
+# def search_semantic_vocabulary(query, limit=5):
+#     """
+#     Search vocabulary_items using semantic similarity.
+
+#     Generates an embedding for the query, compares it with
+#     stored vocabulary embeddings, and returns the closest items.
+#     """
+
+#     if not query or not query.strip():
+#         return []
+
+#     query_embedding = generate_embedding(query.strip())
+
+#     with get_connection() as connection:
+#         rows = connection.execute(f"""
+#             SELECT
+#                 {_VOCABULARY_COLUMNS},
+#                 embedding,
+#                 embedding_model
+#             FROM vocabulary_items
+#             WHERE embedding IS NOT NULL
+#               AND embedding_model = ?
+#         """, (EMBEDDING_MODEL,)).fetchall()
+
+#     matches = []
+
+#     for row in rows:
+#         vocabulary_data = row[:-2]
+#         stored_embedding = row[-2]
+#         stored_model = row[-1]
+
+#         if stored_model != EMBEDDING_MODEL:
+#             continue
+
+#         try:
+#             existing_embedding = json.loads(stored_embedding)
+
+#             similarity = cosine_similarity(
+#                 query_embedding,
+#                 existing_embedding
+#             )
+
+#             if similarity is None:
+#                 continue
+
+#             if similarity >= SIMILARITY_THRESHOLD:
+#                 item = dict(zip(
+#                     [
+#                         "id", "term", "item_type", "meaning_ar",
+#                         "definition_en", "example", "synonyms",
+#                         "topic", "source", "created_at",
+#                         "mastery_status", "review_count",
+#                         "correct_count", "wrong_count",
+#                         "next_review_at", "last_reviewed_at",
+#                         "grammatical_class", "meaning_en",
+#                         "occurrence_count", "correct_streak"
+#                     ],
+#                     vocabulary_data
+#                 ))
+
+#                 item["similarity"] = similarity
+#                 matches.append(item)
+
+#         except (json.JSONDecodeError, TypeError, ValueError) as error:
+#             print(
+#                 f"[WARNING] Could not compare embedding "
+#                 f"for '{row[1]}': {error}"
+#             )
+
+#     matches.sort(
+#         key=lambda item: item["similarity"],
+#         reverse=True
+#     )
+
+#     return matches[:limit]
+# def find_semantic_matches(new_embedding, connection):
+#     """
+#     Compare a new embedding with existing embeddings.
+
+#     Returns items whose similarity is at least SIMILARITY_THRESHOLD.
+#     """
+
+#     rows = connection.execute("""
+#         SELECT id, term, embedding
+#         FROM vocabulary_items
+#         WHERE embedding IS NOT NULL
+#           AND embedding_model = ?
+#     """, (EMBEDDING_MODEL,)).fetchall()
+
+#     matches = []
+
+#     for vocabulary_id, term, stored_embedding in rows:
+
+#         try:
+#             existing_embedding = json.loads(stored_embedding)
+
+#             similarity = cosine_similarity(
+#                 new_embedding,
+#                 existing_embedding
+#             )
+
+#             if similarity is None:
+#                 continue
+
+#             if similarity >= SIMILARITY_THRESHOLD:
+#                 matches.append({
+#                     "id": vocabulary_id,
+#                     "term": term,
+#                     "similarity": similarity,
+#                 })
+
+#         except (json.JSONDecodeError, TypeError, ValueError) as error:
+#             print(
+#                 f"[WARNING] Could not compare embedding "
+#                 f"for '{term}': {error}"
+#             )
+
+#     matches.sort(
+#         key=lambda item: item["similarity"],
+#         reverse=True
+#     )
+
+#     return matches
+
+
+# # ----------------------------------------------------------------------
+# # Vocabulary
+# # ----------------------------------------------------------------------
+
+# def _increment_existing_item(connection, term, item_type):
+#     """
+#     If the term already exists, record another occurrence and
+#     return its ID. Otherwise return None.
+#     """
+
+#     existing = connection.execute("""
+#         SELECT id
+#         FROM vocabulary_items
+#         WHERE LOWER(TRIM(term)) = LOWER(TRIM(?))
+#           AND item_type = ?
+#         LIMIT 1
+#     """, (term, item_type)).fetchone()
+
+#     if not existing:
+#         return None
+
+#     vocabulary_id = existing[0]
+
+#     connection.execute("""
+#         UPDATE vocabulary_items
+#         SET occurrence_count = occurrence_count + 1,
+#             last_seen_at = CURRENT_TIMESTAMP
+#         WHERE id = ?
+#     """, (vocabulary_id,))
+
+#     return vocabulary_id
+
+
+# def save_vocabulary(
+#     term,
+#     item_type,
+#     meaning_ar,
+#     definition_en=None,
+#     example=None,
+#     synonyms=None,
+#     topic=None,
+#     source=None,
+#     grammatical_class=None,
+#     meaning_en=None,
+# ):
+#     """
+#     Save vocabulary items in vocabulary_items.
+
+#     For new items:
+#     1. Generate an embedding.
+#     2. Compare it with existing embeddings.
+#     3. Save semantic relationships.
+#     4. Keep semantically similar expressions as separate items.
+
+#     Existing exact matches only increment occurrence_count.
+#     """
+
+#     if item_type not in ALLOWED_ITEM_TYPES:
+#         raise ValueError(
+#             f"item_type must be one of: {', '.join(ALLOWED_ITEM_TYPES)}"
+#         )
+
+#     term = term.strip()
+
+#     if not term:
+#         raise ValueError("term cannot be empty.")
+
+#     if not meaning_ar or not meaning_ar.strip():
+#         raise ValueError("meaning_ar cannot be empty.")
+    
+#     # Normalize topic before saving.
+#     topic = normalize_topic(topic)
+#     # First, check for an exact existing item
+#     # (avoids a needless API call for duplicates).
+#     with get_connection() as connection:
+#         vocabulary_id = _increment_existing_item(
+#             connection, term, item_type
+#         )
+
+#     if vocabulary_id is not None:
+#         return vocabulary_id
+
+#     # Generate an embedding for a genuinely new item.
+#     embedding = None
+#     embedding_json = None
+
+#     try:
+#         embedding = generate_embedding(term)
+#         embedding_json = json.dumps(embedding)
+
+#         print(f"[EMBEDDING] Generated for: {term}")
+
+#     except Exception as error:
+#         # Do not prevent vocabulary saving if Gemini is unavailable.
+#         print(
+#             f"[WARNING] Embedding generation failed for "
+#             f"'{term}': {error}"
+#         )
+
+#     with get_connection() as connection:
+
+#         # Check again in case the item was inserted in the meantime.
+#         vocabulary_id = _increment_existing_item(
+#             connection, term, item_type
+#         )
+
+#         if vocabulary_id is not None:
+#             return vocabulary_id
+
+#         # Compare against existing vocabulary before inserting.
+#         matches = []
+
+#         if embedding is not None:
+#             matches = find_semantic_matches(embedding, connection)
+
+#         # Insert the new vocabulary item.
+#         cursor = connection.execute("""
+#             INSERT INTO vocabulary_items (
+#                 term,
+#                 item_type,
+#                 grammatical_class,
+#                 meaning_ar,
+#                 meaning_en,
+#                 definition_en,
+#                 example,
+#                 synonyms,
+#                 topic,
+#                 source,
+#                 embedding,
+#                 embedding_model
+#             )
+#             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+#         """, (
+#             term,
+#             item_type,
+#             grammatical_class,
+#             meaning_ar.strip(),
+#             meaning_en.strip() if meaning_en else None,
+#             definition_en.strip() if definition_en else None,
+#             example,
+#             synonyms,
+#             topic,
+#             source,
+#             embedding_json,
+#             EMBEDDING_MODEL if embedding is not None else None,
+#         ))
+
+#         vocabulary_id = cursor.lastrowid
+
+#         # Save semantic relationships.
+#         for match in matches:
+
+#             similarity = match["similarity"]
+
+#             relationship_type = (
+#                 "strong"
+#                 if similarity >= STRONG_SIMILARITY_THRESHOLD
+#                 else "similar"
+#             )
+
+#             connection.execute("""
+#                 INSERT OR IGNORE INTO semantic_relationships (
+#                     item_id,
+#                     related_item_id,
+#                     similarity,
+#                     relationship_type
+#                 )
+#                 VALUES (?, ?, ?, ?)
+#             """, (
+#                 vocabulary_id,
+#                 match["id"],
+#                 similarity,
+#                 relationship_type,
+#             ))
+
+#             print(
+#                 f"[SEMANTIC MATCH] {term} <-> {match['term']} "
+#                 f"| Similarity: {similarity:.4f} "
+#                 f"| Type: {relationship_type}"
+#             )
+
+#         print(
+#             f"[VOCABULARY] Saved '{term}' "
+#             f"with ID {vocabulary_id}"
+#         )
+
+#         return vocabulary_id
+
+
+# _VOCABULARY_COLUMNS = """
+#     id,
+#     term,
+#     item_type,
+#     meaning_ar,
+#     definition_en,
+#     example,
+#     synonyms,
+#     topic,
+#     source,
+#     created_at,
+#     mastery_status,
+#     review_count,
+#     correct_count,
+#     wrong_count,
+#     next_review_at,
+#     last_reviewed_at,
+#     grammatical_class,
+#     meaning_en,
+#     occurrence_count,
+#     correct_streak
+# """
+
+
+# def get_vocabulary():
+#     """Retrieve all saved vocabulary items from vocabulary_items."""
+
+#     with get_connection() as connection:
+#         cursor = connection.execute(f"""
+#             SELECT {_VOCABULARY_COLUMNS}
+#             FROM vocabulary_items
+#             ORDER BY id
+#         """)
+
+#         return cursor.fetchall()
+
+
+# def search_vocabulary(term):
+#     """Search vocabulary items in vocabulary_items."""
+
+#     with get_connection() as connection:
+#         cursor = connection.execute(f"""
+#             SELECT {_VOCABULARY_COLUMNS}
+#             FROM vocabulary_items
+#             WHERE term LIKE ?
+#             ORDER BY term
+#         """, (f"%{term.strip()}%",))
+
+#         return cursor.fetchall()
+
+
+
+# def retrieve_vocabulary_by_topic(topic, limit=5):
+#     """
+#     Retrieve vocabulary items belonging to a specific topic.
+#     Supports canonical topic names and their known aliases.
+#     """
+
+#     normalized_topic = normalize_topic(topic)
+
+#     if not normalized_topic:
+#         return []
+
+#     # Include the canonical topic and its aliases.
+#     aliases = TOPIC_MAPPING.get(normalized_topic, [])
+
+#     accepted_topics = [
+#         normalized_topic,
+#         *aliases
+#     ]
+
+#     # Case-insensitive matching.
+#     accepted_topics = [
+#         value.casefold()
+#         for value in accepted_topics
+#     ]
+
+#     placeholders = ",".join(
+#         "?" for _ in accepted_topics
+#     )
+
+#     with get_connection() as connection:
+#         rows = connection.execute(f"""
+#             SELECT {_VOCABULARY_COLUMNS}
+#             FROM vocabulary_items
+#             WHERE LOWER(TRIM(topic)) IN ({placeholders})
+#             ORDER BY occurrence_count DESC, id DESC
+#             LIMIT ?
+#         """, (
+#             *accepted_topics,
+#             limit
+#         )).fetchall()
+
+#     return rows
+
+
+# def hybrid_retrieve_vocabulary(query, topic=None, limit=10):
+#     """
+#     Combine topic-based and semantic vocabulary retrieval.
+
+#     Ranking:
+#     1. Semantic similarity.
+#     2. A small bonus for matching the requested topic.
+#     3. A small bonus for frequently used vocabulary.
+
+#     Duplicate vocabulary items are merged by ID.
+#     """
+
+#     if not query or not query.strip():
+#         if not topic or not topic.strip():
+#             return []
+
+#     limit = max(1, int(limit))
+#     candidates = {}
+
+#     columns = [
+#         "id", "term", "item_type", "meaning_ar",
+#         "definition_en", "example", "synonyms",
+#         "topic", "source", "created_at",
+#         "mastery_status", "review_count",
+#         "correct_count", "wrong_count",
+#         "next_review_at", "last_reviewed_at",
+#         "grammatical_class", "meaning_en",
+#         "occurrence_count", "correct_streak"
+#     ]
+
+#     # 1. Retrieve vocabulary by topic.
+#     if topic and topic.strip():
+
+#         topic_results = retrieve_vocabulary_by_topic(
+#             topic,
+#             limit=limit * 3
+#         )
+
+#         for row in topic_results:
+
+#             item = dict(zip(columns, row))
+
+#             item["similarity"] = 0.0
+#             item["topic_match"] = True
+#             item["retrieval_sources"] = ["topic"]
+
+#             candidates[item["id"]] = item
+
+#     # 2. Retrieve semantically similar vocabulary.
+#     if query and query.strip():
+
+#         semantic_results = search_semantic_vocabulary(
+#             query,
+#             limit=limit * 3
+#         )
+
+#         for item in semantic_results:
+
+#             vocabulary_id = item["id"]
+
+#             if vocabulary_id in candidates:
+
+#                 candidates[vocabulary_id]["similarity"] = (
+#                     item["similarity"]
+#                 )
+
+#                 candidates[vocabulary_id][
+#                     "retrieval_sources"
+#                 ].append("semantic")
+
+#             else:
+
+#                 item["topic_match"] = False
+#                 item["retrieval_sources"] = ["semantic"]
+
+#                 candidates[vocabulary_id] = item
+
+#     # 3. Rank combined results.
+#     results = list(candidates.values())
+
+#     # Topic-only search: rank by frequency.
+#     if not query or not query.strip():
+
+#         results.sort(
+#             key=lambda item: (
+#                 item["occurrence_count"],
+#                 item["id"]
+#             ),
+#             reverse=True
+#         )
+
+#         for item in results:
+#             item["relevance_score"] = 0.0
+
+#         return results[:limit]
+
+#     # Calculate a small normalized occurrence bonus.
+#     max_occurrences = max(
+#         (item["occurrence_count"] for item in results),
+#         default=1
+#     )
+
+#     max_occurrences = max(1, max_occurrences)
+
+#     for item in results:
+
+#         semantic_score = item["similarity"]
+
+#         # Small bonus for matching the requested topic.
+#         topic_bonus = 0.08 if item["topic_match"] else 0.0
+
+#         # Frequency bonus: maximum 0.02.
+#         occurrence_bonus = (
+#             0.02
+#             * math.log1p(item["occurrence_count"])
+#             / math.log1p(max_occurrences)
+#         )
+
+#         item["relevance_score"] = (
+#             semantic_score
+#             + topic_bonus
+#             + occurrence_bonus
+#         )
+
+#     # Sort by combined relevance.
+#     results.sort(
+#         key=lambda item: (
+#             item["relevance_score"],
+#             item["similarity"],
+#             item["occurrence_count"]
+#         ),
+#         reverse=True
+#     )
+
+#     return results[:limit]
+
+
+# def get_semantic_relationships(vocabulary_id):
+#     """
+#     Retrieve semantic relationships for a vocabulary item.
+
+#     Searches in both directions because a relationship
+#     is stored from the newly inserted item to an older item.
+#     """
+
+#     with get_connection() as connection:
+
+#         rows = connection.execute("""
+#             SELECT
+#                 vocabulary_items.id,
+#                 vocabulary_items.term,
+#                 semantic_relationships.similarity,
+#                 semantic_relationships.relationship_type
+
+#             FROM semantic_relationships
+
+#             JOIN vocabulary_items
+#                 ON vocabulary_items.id =
+#                     CASE
+#                         WHEN semantic_relationships.item_id = ?
+#                         THEN semantic_relationships.related_item_id
+#                         ELSE semantic_relationships.item_id
+#                     END
+
+#             WHERE semantic_relationships.item_id = ?
+#                OR semantic_relationships.related_item_id = ?
+
+#             ORDER BY semantic_relationships.similarity DESC
+#         """, (
+#             vocabulary_id,
+#             vocabulary_id,
+#             vocabulary_id,
+#         )).fetchall()
+
+#     return [
+#         {
+#             "id": row[0],
+#             "term": row[1],
+#             "similarity": row[2],
+#             "relationship_type": row[3],
+#         }
+#         for row in rows
+#     ]
+
+
+# def update_vocabulary(
+#     vocabulary_id,
+#     meaning_ar=None,
+#     meaning_en=None,
+#     definition_en=None,
+#     grammatical_class=None,
+#     example=None,
+#     synonyms=None,
+#     topic=None,
+#     source=None,
+# ):
+#     """Update selected information for a vocabulary item."""
+
+#     fields = {
+#         "meaning_ar": meaning_ar,
+#         "meaning_en": meaning_en,
+#         "definition_en": definition_en,
+#         "grammatical_class": grammatical_class,
+#         "example": example,
+#         "synonyms": synonyms,
+#         "topic": topic,
+#         "source": source,
+#     }
+
+#     updates = {
+#         key: value
+#         for key, value in fields.items()
+#         if value is not None
+#     }
+
+#     if not updates:
+#         return False
+
+#     set_clause = ", ".join(
+#         f"{column} = ?" for column in updates
+#     )
+#     set_clause += ", updated_at = CURRENT_TIMESTAMP"
+
+#     values = list(updates.values())
+#     values.append(vocabulary_id)
+
+#     with get_connection() as connection:
+#         cursor = connection.execute(
+#             f"UPDATE vocabulary_items SET {set_clause} WHERE id = ?",
+#             values,
+#         )
+
+#         return cursor.rowcount > 0
+
+
+# def delete_vocabulary(vocabulary_id):
+#     """
+#     Delete a vocabulary item by its ID,
+#     together with its semantic relationships (no orphan rows).
+#     """
+
+#     with get_connection() as connection:
+#         connection.execute("""
+#             DELETE FROM semantic_relationships
+#             WHERE item_id = ? OR related_item_id = ?
+#         """, (vocabulary_id, vocabulary_id))
+
+#         cursor = connection.execute(
+#             "DELETE FROM vocabulary_items WHERE id = ?",
+#             (vocabulary_id,)
+#         )
+
+#         return cursor.rowcount > 0
+
+
+# if __name__ == "__main__":
+#     init_db()
+
+#     print(f"Database initialized at: {DB_PATH}")
+
+#     # Quick manual test. This used to run at import time (before the
+#     # tables existed, and every time another file imported this module).
+#     save_vocabulary(
+#         "deal with difficulties",
+#         "expression",
+#         "التعامل مع الصعوبات"
+#     )
+
+#     print("\nSaved English mistakes:")
+#     for mistake in get_mistakes():
+#         print(mistake)
+
+#     print("\nMistakes due for review:")
+#     for mistake in get_due_mistakes():
+#         print(mistake)
+
+#     print("\nLearning statistics:")
+#     print(get_learning_stats())
+
+#     print("\nMistakes by category:")
+#     for item in get_mistake_category_stats():
+#         print(f"{item['category']}: {item['count']}")
+
+#     print("\nRecent conversation:")
+#     for message in get_chat_history():
+#         print(message)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import sqlite3
+import os
+import json
+import math
+from contextlib import contextmanager
+from pathlib import Path
+from datetime import datetime, timedelta
+
+from dotenv import load_dotenv
+from google import genai
+
+from google.genai import types
+
+# Store the database beside this file.
+DB_PATH = Path(__file__).parent / "learner_memory.db"
+
+# Spaced-repetition intervals, in days.
+REVIEW_INTERVALS = [1, 3, 7, 14, 40]
+
+# Semantic embedding configuration.
+EMBEDDING_MODEL = "gemini-embedding-001"
+
+# Initial similarity thresholds.
+SIMILARITY_THRESHOLD = 0.65
+STRONG_SIMILARITY_THRESHOLD = 0.85
+
+
+TOPIC_MAPPING = {
+    "Communication": [
+        "Communication Skills",
+        "General Communication",
+    ],
+
+    "Professional Communication": [
+        "Workplace Communication",
+        "Business/Professional Communication",
+        "Polite Communication",
+        "Business Etiquette",
+    ],
+
+    "Personal Development": [
+        "Personal Growth",
+    ],
+
+    "Goals & Ambition": [
+        "Goals and Ambition",
+    ],
+
+    "Professional Development": [
+        "Professional Training",
+    ],
+
+    "Professionalism": [],
+
+    "Work & Career": [
+        "Work & Employment",
+        "Work and Professional Life",
+        "Work and Career",
+        "Career/Employment",
+        "Career Development",
+    ],
+
+    "Psychology & Well-being": [
+        "Psychology",
+        "Mental Health",
+        "Well-being",
+        "Emotions/Psychology",
+        "Emotions & Psychology",
+    ],
+
+    "Psychology & Personal Growth": [
+        "Psychology / Personal Growth",
+        "Psychology and Personal Growth",
+    ],
+
+    "Workplace Stress": [
+        "Workplace/Psychology",
+    ],
+
+    "Professional Relationships": [
+        "Professional Relations",
+    ],
+
+    "Grammar & Writing": [
+        "Grammar",
+        "Writing",
+    ],
+
+    "Productivity": [
+        "Productivity/Management",
+    ],
+
+    "Productivity & Learning": [],
+
+    "English Learning": [
+        "Language Learning",
+        "General Language",
+    ],
+
+    "Business & Management": [
+        "Business and Management",
+    ],
+
+    "Business & Research": [],
+
+    "Daily Conversation": [],
+
+    "Daily Life": [
+        "Lifestyle",
+    ],
+
+    "General Movement / Technology": [],
+
+    "Technology": [],
+}
+
+
+def normalize_topic(topic):
+    """Return the canonical topic name without modifying the database."""
+
+    if not topic or not isinstance(topic, str) or not topic.strip():
+        return None
+
+    normalized = topic.strip().casefold()
+
+    for canonical_topic, aliases in TOPIC_MAPPING.items():
+        if normalized == canonical_topic.casefold():
+            return canonical_topic
+
+        for alias in aliases:
+            if normalized == alias.casefold():
+                return canonical_topic
+
+    # Preserve unknown topics instead of assigning them incorrectly.
+    return topic.strip()
+
+
+ALLOWED_ITEM_TYPES = (
+    "word",
+    "expression",
+    "phrasal verb",
+    "idiom",
+    "collocation",
+)
+
+
+@contextmanager
+def get_connection():
+    """
+    Open a SQLite connection, commit on success, roll back on error,
+    and ALWAYS close it.
+
+    (Plain `with sqlite3.connect(...)` commits but never closes the
+    connection, which can leave the database file locked.)
+    """
+
+    connection = sqlite3.connect(DB_PATH)
+
+    try:
+        yield connection
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
+
+
+def init_db():
+    """Create the tables and safely update an existing database."""
+
+    with get_connection() as connection:
+
+        # Table for English mistakes.
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS mistakes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                original_sentence TEXT NOT NULL,
+                correction TEXT NOT NULL,
+                explanation TEXT,
+                category TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # Legacy table for English vocabulary and expressions.
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS vocabulary (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                term TEXT NOT NULL,
+                item_type TEXT NOT NULL
+                    CHECK (item_type IN ('word', 'expression')),
+                meaning_ar TEXT NOT NULL,
+                definition_en TEXT NOT NULL,
+                example TEXT,
+                synonyms TEXT,
+                topic TEXT,
+                source TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                mastery_status TEXT NOT NULL DEFAULT 'Learning'
+                    CHECK (
+                        mastery_status IN (
+                            'Learning',
+                            'Review',
+                            'Mastered'
+                        )
+                    ),
+                review_count INTEGER NOT NULL DEFAULT 0,
+                correct_count INTEGER NOT NULL DEFAULT 0,
+                wrong_count INTEGER NOT NULL DEFAULT 0,
+                next_review_at TEXT,
+                last_reviewed_at TEXT
+            )
+        """)
+
+        # Unified table for all vocabulary items.
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS vocabulary_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                term TEXT NOT NULL COLLATE NOCASE,
+                item_type TEXT NOT NULL CHECK (
+                    item_type IN (
+                        'word',
+                        'expression',
+                        'phrasal verb',
+                        'idiom',
+                        'collocation'
+                    )
+                ),
+
+                grammatical_class TEXT,
+                meaning_ar TEXT NOT NULL,
+                meaning_en TEXT,
+                definition_en TEXT,
+                example TEXT,
+                synonyms TEXT,
+                topic TEXT,
+                source TEXT,
+
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                first_seen_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                last_seen_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                occurrence_count INTEGER NOT NULL DEFAULT 1,
+
+                mastery_status TEXT NOT NULL DEFAULT 'Learning'
+                    CHECK (
+                        mastery_status IN (
+                            'Learning',
+                            'Review',
+                            'Mastered'
+                        )
+                    ),
+
+                review_count INTEGER NOT NULL DEFAULT 0,
+                correct_count INTEGER NOT NULL DEFAULT 0,
+                wrong_count INTEGER NOT NULL DEFAULT 0,
+                correct_streak INTEGER NOT NULL DEFAULT 0,
+
+                next_review_at TEXT,
+                last_reviewed_at TEXT,
+                mastered_at TEXT
+            )
+        """)
+
+        # Table for conversation history.
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS conversations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # Add Phase 3 columns to existing databases.
+        existing_columns = {
+            row[1]
+            for row in connection.execute(
+                "PRAGMA table_info(mistakes)"
+            ).fetchall()
+        }
+
+        new_columns = {
+            "next_review_at": "TEXT",
+            "review_count": "INTEGER NOT NULL DEFAULT 0",
+            "correct_streak": "INTEGER NOT NULL DEFAULT 0",
+            "correct_count": "INTEGER NOT NULL DEFAULT 0",
+            "wrong_count": "INTEGER NOT NULL DEFAULT 0",
+            "last_reviewed_at": "TEXT",
+            "last_review_result": "INTEGER",
+        }
+
+        for column_name, column_type in new_columns.items():
+            if column_name not in existing_columns:
+                connection.execute(
+                    f"ALTER TABLE mistakes "
+                    f"ADD COLUMN {column_name} {column_type}"
+                )
+
+        # Schedule existing mistakes based on their original creation date.
+        # Old mistakes will already be due if their review date has passed.
+        # 'localtime' keeps the fallback consistent with the Python-written
+        # timestamps and with the comparison used in get_due_mistakes().
+        connection.execute("""
+            UPDATE mistakes
+            SET next_review_at = COALESCE(
+                datetime(created_at, '+1 day'),
+                datetime('now', 'localtime')
+            )
+            WHERE next_review_at IS NULL
+        """)
+
+        # Add embedding columns to existing vocabulary databases.
+        vocabulary_columns = {
+            row[1]
+            for row in connection.execute(
+                "PRAGMA table_info(vocabulary_items)"
+            ).fetchall()
+        }
+
+        if "embedding" not in vocabulary_columns:
+            connection.execute("""
+                ALTER TABLE vocabulary_items
+                ADD COLUMN embedding TEXT
+            """)
+
+        if "embedding_model" not in vocabulary_columns:
+            connection.execute("""
+                ALTER TABLE vocabulary_items
+                ADD COLUMN embedding_model TEXT
+            """)
+
+        # Store semantic relationships between vocabulary items.
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS semantic_relationships (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                item_id INTEGER NOT NULL,
+                related_item_id INTEGER NOT NULL,
+                similarity REAL NOT NULL,
+                relationship_type TEXT NOT NULL
+                    CHECK (
+                        relationship_type IN ('similar', 'strong')
+                    ),
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+                UNIQUE(item_id, related_item_id)
+            )
+        """)
+
+        connection.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_semantic_relationships_item
+            ON semantic_relationships(item_id)
+        """)
+
+        connection.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_semantic_relationships_related
+            ON semantic_relationships(related_item_id)
+        """)
+
+
+# ----------------------------------------------------------------------
+# Mistakes
+# ----------------------------------------------------------------------
+
+def save_mistake(original, correction, explanation, category):
+    """Save a mistake and schedule its first review for tomorrow."""
+
+    now = datetime.now().replace(microsecond=0)
+    next_review = now + timedelta(days=1)
+
+    with get_connection() as connection:
+        cursor = connection.execute("""
+            INSERT INTO mistakes (
+                original_sentence,
+                correction,
+                explanation,
+                category,
+                created_at,
+                next_review_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            original,
+            correction,
+            explanation,
+            category,
+            now.isoformat(sep=" "),
+            next_review.isoformat(sep=" "),
+        ))
+
+        return cursor.lastrowid
+
+
+def get_mistakes():
+    """
+    Retrieve saved mistakes.
+
+    Keeps the original six-field return format so existing tutor.py
+    code can continue to unpack the results.
+    """
+
+    with get_connection() as connection:
+        cursor = connection.execute("""
+            SELECT
+                id,
+                original_sentence,
+                correction,
+                explanation,
+                category,
+                created_at
+            FROM mistakes
+            ORDER BY id
+        """)
+
+        return cursor.fetchall()
+
+
+def get_due_mistakes(limit=3):
+    """Retrieve mistakes whose scheduled review time has arrived."""
+
+    with get_connection() as connection:
+        cursor = connection.execute("""
+            SELECT
+                id,
+                original_sentence,
+                correction,
+                explanation,
+                category,
+                created_at,
+                next_review_at,
+                review_count,
+                correct_streak,
+                correct_count,
+                wrong_count,
+                last_reviewed_at,
+                last_review_result
+            FROM mistakes
+            WHERE datetime(next_review_at) <= datetime('now', 'localtime')
+            ORDER BY datetime(next_review_at) ASC, id ASC
+            LIMIT ?
+        """, (limit,))
+
+        return cursor.fetchall()
+
+
+def record_review_result(mistake_id, was_correct):
+    """
+    Record the result of an exercise.
+
+    Correct answers receive increasingly longer review intervals.
+    Incorrect answers are scheduled again for tomorrow.
+    """
+
+    now = datetime.now().replace(microsecond=0)
+
+    with get_connection() as connection:
+        row = connection.execute("""
+            SELECT
+                review_count,
+                correct_streak,
+                correct_count,
+                wrong_count
+            FROM mistakes
+            WHERE id = ?
+        """, (mistake_id,)).fetchone()
+
+        if row is None:
+            return False
+
+        review_count, streak, correct_count, wrong_count = row
+
+        review_count += 1
+
+        if was_correct:
+            streak += 1
+            correct_count += 1
+
+            # 1, 3, 7, 14, then every 40 days.
+            interval_index = min(streak - 1, len(REVIEW_INTERVALS) - 1)
+            interval_days = REVIEW_INTERVALS[interval_index]
+
+        else:
+            streak = 0
+            wrong_count += 1
+            interval_days = 1
+
+        next_review = now + timedelta(days=interval_days)
+
+        connection.execute("""
+            UPDATE mistakes
+            SET
+                review_count = ?,
+                correct_streak = ?,
+                correct_count = ?,
+                wrong_count = ?,
+                last_reviewed_at = ?,
+                last_review_result = ?,
+                next_review_at = ?
+            WHERE id = ?
+        """, (
+            review_count,
+            streak,
+            correct_count,
+            wrong_count,
+            now.isoformat(sep=" "),
+            1 if was_correct else 0,
+            next_review.isoformat(sep=" "),
+            mistake_id,
+        ))
+
+        return True
+
+
+def get_learning_stats():
+    """Return basic statistics about the learner's saved mistakes."""
+
+    with get_connection() as connection:
+        row = connection.execute("""
+            SELECT
+                COUNT(*),
+                COALESCE(SUM(correct_count), 0),
+                COALESCE(SUM(wrong_count), 0),
+                COALESCE(SUM(
+                    CASE
+                        WHEN datetime(next_review_at)
+                             <= datetime('now', 'localtime')
+                        THEN 1
+                        ELSE 0
+                    END
+                ), 0)
+            FROM mistakes
+        """).fetchone()
+
+    return {
+        "total_mistakes": row[0],
+        "correct_answers": row[1],
+        "wrong_answers": row[2],
+        "due_reviews": row[3],
+    }
+
+
+# ----------------------------------------------------------------------
+# Conversation history
+# ----------------------------------------------------------------------
+
+def save_message(role, content):
+    """Save one user or tutor message."""
+
+    with get_connection() as connection:
+        connection.execute("""
+            INSERT INTO conversations (role, content)
+            VALUES (?, ?)
+        """, (role, content))
+
+
+def get_chat_history(limit=30):
+    """Return recent conversation messages in chronological order."""
+
+    with get_connection() as connection:
+        cursor = connection.execute("""
+            SELECT role, content
+            FROM conversations
+            ORDER BY id DESC
+            LIMIT ?
+        """, (limit,))
+
+        rows = cursor.fetchall()
+
+    # The query returns newest first; reverse for the tutor.
+    return list(reversed(rows))
+
+
+# ----------------------------------------------------------------------
+# Mistake statistics
+# ----------------------------------------------------------------------
+
+def get_mistake_category_stats():
+    """Count saved mistakes using consistent, meaningful category labels."""
+
+    category_aliases = {
+        "grammar": "Grammar",
+        "grammar and punctuation": "Grammar/Punctuation",
+        "grammar/punctuation": "Grammar/Punctuation",
+        "grammar and spelling": "Grammar/Spelling",
+        "grammar/spelling": "Grammar/Spelling",
+        "grammar/word order": "Grammar/Word Order",
+        "verb tense": "Verb Tense",
+        "punctuation": "Punctuation",
+        "spelling": "Spelling",
+        "vocabulary": "Vocabulary",
+        "word choice": "Word Choice",
+        "word_choice": "Word Choice",
+    }
+
+    with get_connection() as connection:
+        rows = connection.execute("""
+            SELECT
+                COALESCE(NULLIF(TRIM(category), ''), 'Uncategorized'),
+                COUNT(*)
+            FROM mistakes
+            GROUP BY COALESCE(
+                NULLIF(TRIM(category), ''),
+                'Uncategorized'
+            )
+        """).fetchall()
+
+    counts = {}
+
+    for category, count in rows:
+        key = category.strip().lower()
+        normalized = category_aliases.get(key, category.strip())
+        counts[normalized] = counts.get(normalized, 0) + count
+
+    return [
+        {"category": category, "count": count}
+        for category, count in sorted(
+            counts.items(),
+            key=lambda item: item[1],
+            reverse=True
+        )
+    ]
+
+
+def get_recurring_mistakes():
+    """Identify recurring error patterns across different sentences."""
+
+    with get_connection() as connection:
+        rows = connection.execute("""
+            SELECT original_sentence, correction, category
+            FROM mistakes
+            ORDER BY id
+        """).fetchall()
+
+    recurring = {}
+
+    for original, correction, category in rows:
+        original_lower = original.lower()
+        correction_lower = correction.lower()
+        category_lower = (category or "").lower()
+
+        # Identify patterns using the saved category.
+        matched_patterns = []
+
+        if category_lower == "verb tense":
+            matched_patterns.append("Verb Tense")
+        elif "word order" in category_lower:
+            matched_patterns.append("Grammar/Word Order")
+        elif "spelling" in category_lower:
+            matched_patterns.append("Grammar/Spelling")
+        elif "punctuation" in category_lower:
+            matched_patterns.append("Grammar/Punctuation")
+
+        # Recognize common past-tense errors in different sentences.
+        if (
+            "yesterday" in original_lower
+            and original_lower != correction_lower
+        ):
+            if "Verb Tense" not in matched_patterns:
+                matched_patterns.append("Verb Tense")
+
+        for pattern in matched_patterns:
+            if pattern not in recurring:
+                recurring[pattern] = {
+                    "original": original,
+                    "correction": correction,
+                    "category": pattern,
+                    "occurrences": 0,
+                    "examples": [],
+                }
+
+            recurring[pattern]["occurrences"] += 1
+
+            if len(recurring[pattern]["examples"]) < 5:
+                recurring[pattern]["examples"].append({
+                    "original": original,
+                    "correction": correction,
+                })
+
+    return [
+        item
+        for item in recurring.values()
+        if item["occurrences"] > 1
+    ]
+
+
+# ----------------------------------------------------------------------
+# Embeddings
+# ----------------------------------------------------------------------
+
+_gemini_client = None
+
+
+def _get_gemini_client():
+    """Create the Gemini client once and reuse it."""
+
+    global _gemini_client
+
+    if _gemini_client is None:
+        load_dotenv()
+
+        api_key = os.getenv("GEMINI_API_KEY")
+
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY was not found in .env")
+
+        _gemini_client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(timeout=60_000),  # 60 seconds
+        )
+
+    return _gemini_client
+
+
+def generate_embedding(term):
+    """
+    Generate an embedding for an English vocabulary item
+    using Gemini.
+    """
+
+    client = _get_gemini_client()
+
+    result = client.models.embed_content(
+        model=EMBEDDING_MODEL,
+        contents=term
+    )
+
+    return result.embeddings[0].values
+
+
+def cosine_similarity(vector_a, vector_b):
+    """Calculate cosine similarity between two embedding vectors."""
+
+    if len(vector_a) != len(vector_b):
+        return None
+
+    dot_product = sum(
+        a * b for a, b in zip(vector_a, vector_b)
+    )
+
+    norm_a = math.sqrt(sum(a * a for a in vector_a))
+    norm_b = math.sqrt(sum(b * b for b in vector_b))
+
+    if norm_a == 0 or norm_b == 0:
+        return None
+
+    return dot_product / (norm_a * norm_b)
+
+
+def search_semantic_vocabulary(query, limit=5):
+    """
+    Search vocabulary_items using semantic similarity.
+
+    Generates an embedding for the query, compares it with
+    stored vocabulary embeddings, and returns the closest items.
+    """
+
+    if not query or not query.strip():
+        return []
+
+    query_embedding = generate_embedding(query.strip())
+
+    with get_connection() as connection:
+        rows = connection.execute(f"""
+            SELECT
+                {_VOCABULARY_COLUMNS},
+                embedding,
+                embedding_model
+            FROM vocabulary_items
+            WHERE embedding IS NOT NULL
+              AND embedding_model = ?
+        """, (EMBEDDING_MODEL,)).fetchall()
+
+    matches = []
+
+    for row in rows:
+        vocabulary_data = row[:-2]
+        stored_embedding = row[-2]
+        stored_model = row[-1]
+
+        if stored_model != EMBEDDING_MODEL:
+            continue
+
+        try:
+            existing_embedding = json.loads(stored_embedding)
+
+            similarity = cosine_similarity(
+                query_embedding,
+                existing_embedding
+            )
+
+            if similarity is None:
+                continue
+
+            if similarity >= SIMILARITY_THRESHOLD:
+                item = dict(zip(
+                    _VOCABULARY_FIELD_NAMES,
+                    vocabulary_data
+                ))
+
+                item["similarity"] = similarity
+                matches.append(item)
+
+        except (json.JSONDecodeError, TypeError, ValueError) as error:
+            print(
+                f"[WARNING] Could not compare embedding "
+                f"for '{row[1]}': {error}"
+            )
+
+    matches.sort(
+        key=lambda item: item["similarity"],
+        reverse=True
+    )
+
+    return matches[:limit]
+
+
+def find_semantic_matches(new_embedding, connection):
+    """
+    Compare a new embedding with existing embeddings.
+
+    Returns items whose similarity is at least SIMILARITY_THRESHOLD.
+    """
+
+    rows = connection.execute("""
+        SELECT id, term, embedding
+        FROM vocabulary_items
+        WHERE embedding IS NOT NULL
+          AND embedding_model = ?
+    """, (EMBEDDING_MODEL,)).fetchall()
+
+    matches = []
+
+    for vocabulary_id, term, stored_embedding in rows:
+
+        try:
+            existing_embedding = json.loads(stored_embedding)
+
+            similarity = cosine_similarity(
+                new_embedding,
+                existing_embedding
+            )
+
+            if similarity is None:
+                continue
+
+            if similarity >= SIMILARITY_THRESHOLD:
+                matches.append({
+                    "id": vocabulary_id,
+                    "term": term,
+                    "similarity": similarity,
+                })
+
+        except (json.JSONDecodeError, TypeError, ValueError) as error:
+            print(
+                f"[WARNING] Could not compare embedding "
+                f"for '{term}': {error}"
+            )
+
+    matches.sort(
+        key=lambda item: item["similarity"],
+        reverse=True
+    )
+
+    return matches
+
+
+# ----------------------------------------------------------------------
+# Vocabulary
+# ----------------------------------------------------------------------
+
+def _increment_existing_item(connection, term, item_type):
+    """
+    If the term already exists, record another occurrence and
+    return its ID. Otherwise return None.
+    """
+
+    existing = connection.execute("""
+        SELECT id
+        FROM vocabulary_items
+        WHERE LOWER(TRIM(term)) = LOWER(TRIM(?))
+          AND item_type = ?
+        LIMIT 1
+    """, (term, item_type)).fetchone()
+
+    if not existing:
+        return None
+
+    vocabulary_id = existing[0]
+
+    connection.execute("""
+        UPDATE vocabulary_items
+        SET occurrence_count = occurrence_count + 1,
+            last_seen_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    """, (vocabulary_id,))
+
+    return vocabulary_id
+
+
+def save_vocabulary(
+    term,
+    item_type,
+    meaning_ar,
+    definition_en=None,
+    example=None,
+    synonyms=None,
+    topic=None,
+    source=None,
+    grammatical_class=None,
+    meaning_en=None,
+):
+    """
+    Save vocabulary items in vocabulary_items.
+
+    For new items:
+    1. Generate an embedding.
+    2. Compare it with existing embeddings.
+    3. Save semantic relationships.
+    4. Keep semantically similar expressions as separate items.
+
+    Existing exact matches only increment occurrence_count.
+    """
+
+    if item_type not in ALLOWED_ITEM_TYPES:
+        raise ValueError(
+            f"item_type must be one of: {', '.join(ALLOWED_ITEM_TYPES)}"
+        )
+
+    term = term.strip()
+
+    if not term:
+        raise ValueError("term cannot be empty.")
+
+    if not meaning_ar or not meaning_ar.strip():
+        raise ValueError("meaning_ar cannot be empty.")
+
+    # Normalize topic before saving.
+    topic = normalize_topic(topic)
+
+    # First, check for an exact existing item
+    # (avoids a needless API call for duplicates).
+    with get_connection() as connection:
+        vocabulary_id = _increment_existing_item(
+            connection, term, item_type
+        )
+
+    if vocabulary_id is not None:
+        return vocabulary_id
+
+    # Generate an embedding for a genuinely new item.
+    embedding = None
+    embedding_json = None
+
+    try:
+        embedding = generate_embedding(term)
+        embedding_json = json.dumps(embedding)
+
+        print(f"[EMBEDDING] Generated for: {term}")
+
+    except Exception as error:
+        # Do not prevent vocabulary saving if Gemini is unavailable.
+        print(
+            f"[WARNING] Embedding generation failed for "
+            f"'{term}': {error}"
+        )
+
+    with get_connection() as connection:
+
+        # Check again in case the item was inserted in the meantime.
+        vocabulary_id = _increment_existing_item(
+            connection, term, item_type
+        )
+
+        if vocabulary_id is not None:
+            return vocabulary_id
+
+        # Compare against existing vocabulary before inserting.
+        matches = []
+
+        if embedding is not None:
+            matches = find_semantic_matches(embedding, connection)
+
+        # Insert the new vocabulary item.
+        cursor = connection.execute("""
+            INSERT INTO vocabulary_items (
+                term,
+                item_type,
+                grammatical_class,
+                meaning_ar,
+                meaning_en,
+                definition_en,
+                example,
+                synonyms,
+                topic,
+                source,
+                embedding,
+                embedding_model
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            term,
+            item_type,
+            grammatical_class,
+            meaning_ar.strip(),
+            meaning_en.strip() if meaning_en else None,
+            definition_en.strip() if definition_en else None,
+            example,
+            synonyms,
+            topic,
+            source,
+            embedding_json,
+            EMBEDDING_MODEL if embedding is not None else None,
+        ))
+
+        vocabulary_id = cursor.lastrowid
+
+        # Save semantic relationships.
+        for match in matches:
+
+            similarity = match["similarity"]
+
+            relationship_type = (
+                "strong"
+                if similarity >= STRONG_SIMILARITY_THRESHOLD
+                else "similar"
+            )
+
+            connection.execute("""
+                INSERT OR IGNORE INTO semantic_relationships (
+                    item_id,
+                    related_item_id,
+                    similarity,
+                    relationship_type
+                )
+                VALUES (?, ?, ?, ?)
+            """, (
+                vocabulary_id,
+                match["id"],
+                similarity,
+                relationship_type,
+            ))
+
+            print(
+                f"[SEMANTIC MATCH] {term} <-> {match['term']} "
+                f"| Similarity: {similarity:.4f} "
+                f"| Type: {relationship_type}"
+            )
+
+        print(
+            f"[VOCABULARY] Saved '{term}' "
+            f"with ID {vocabulary_id}"
+        )
+
+        return vocabulary_id
+
+
+_VOCABULARY_COLUMNS = """
+    id,
+    term,
+    item_type,
+    meaning_ar,
+    definition_en,
+    example,
+    synonyms,
+    topic,
+    source,
+    created_at,
+    mastery_status,
+    review_count,
+    correct_count,
+    wrong_count,
+    next_review_at,
+    last_reviewed_at,
+    grammatical_class,
+    meaning_en,
+    occurrence_count,
+    correct_streak
+"""
+
+# Field names matching _VOCABULARY_COLUMNS, in the same order.
+_VOCABULARY_FIELD_NAMES = [
+    "id", "term", "item_type", "meaning_ar",
+    "definition_en", "example", "synonyms",
+    "topic", "source", "created_at",
+    "mastery_status", "review_count",
+    "correct_count", "wrong_count",
+    "next_review_at", "last_reviewed_at",
+    "grammatical_class", "meaning_en",
+    "occurrence_count", "correct_streak",
+]
+
+
+def get_vocabulary():
+    """Retrieve all saved vocabulary items from vocabulary_items."""
+
+    with get_connection() as connection:
+        cursor = connection.execute(f"""
+            SELECT {_VOCABULARY_COLUMNS}
+            FROM vocabulary_items
+            ORDER BY id
+        """)
+
+        return cursor.fetchall()
+
+
+def search_vocabulary(term):
+    """Search vocabulary items in vocabulary_items."""
+
+    with get_connection() as connection:
+        cursor = connection.execute(f"""
+            SELECT {_VOCABULARY_COLUMNS}
+            FROM vocabulary_items
+            WHERE term LIKE ?
+            ORDER BY term
+        """, (f"%{term.strip()}%",))
+
+        return cursor.fetchall()
+
+
+# ----------------------------------------------------------------------
+# Topic-aware retrieval
+# ----------------------------------------------------------------------
+
+def _get_topic_variants(topics):
+    """
+    Return canonical topic names plus their known aliases.
+
+    Accepts one topic (str) or a list of topics (main topic and
+    subtopics). Unknown topics are preserved as they are.
+    The result has no duplicates (case-insensitive).
+    """
+
+    if not topics:
+        return []
+
+    if isinstance(topics, str):
+        topics = [topics]
+
+    variants = []
+    seen = set()
+
+    def add(value):
+        if not isinstance(value, str):
+            return
+
+        value = value.strip()
+
+        if not value:
+            return
+
+        key = value.casefold()
+
+        if key not in seen:
+            seen.add(key)
+            variants.append(value)
+
+    for topic in topics:
+        if not isinstance(topic, str) or not topic.strip():
+            continue
+
+        original = topic.strip()
+        canonical = normalize_topic(original)
+
+        add(original)
+
+        if canonical:
+            add(canonical)
+
+            for alias in TOPIC_MAPPING.get(canonical, []):
+                add(alias)
+
+    return variants
+
+
+def retrieve_vocabulary_by_topic(topic, limit=5):
+    """
+    Retrieve vocabulary items belonging to one or more topics.
+
+    `topic` may be a single topic string or a list of topics.
+    Supports canonical topic names, their known aliases, and
+    unknown topics (which are preserved).
+    """
+
+    variants = _get_topic_variants(topic)
+
+    if not variants:
+        return []
+
+    accepted_topics = [value.casefold() for value in variants]
+
+    placeholders = ",".join("?" for _ in accepted_topics)
+
+    with get_connection() as connection:
+        rows = connection.execute(f"""
+            SELECT {_VOCABULARY_COLUMNS}
+            FROM vocabulary_items
+            WHERE LOWER(TRIM(topic)) IN ({placeholders})
+            ORDER BY occurrence_count DESC, id DESC
+            LIMIT ?
+        """, (
+            *accepted_topics,
+            limit
+        )).fetchall()
+
+    return rows
+
+
+def hybrid_retrieve_vocabulary(
+    query,
+    topic=None,
+    limit=10,
+    subtopics=None,
+):
+    """
+    Combine topic-based and semantic vocabulary retrieval.
+
+    - `topic` is the main topic; `subtopics` is a list (or string)
+      of related topics. Both are used for topic retrieval.
+    - Topic retrieval keeps working even if Gemini embeddings fail.
+
+    Ranking:
+    1. Semantic similarity.
+    2. A small bonus for matching the requested topic(s).
+    3. A small bonus for frequently used vocabulary.
+
+    Duplicate vocabulary items are merged by ID.
+    """
+
+    all_topics = []
+
+    if isinstance(topic, str) and topic.strip():
+        all_topics.append(topic)
+    elif isinstance(topic, (list, tuple)):
+        all_topics.extend(topic)
+
+    if subtopics:
+        if isinstance(subtopics, str):
+            all_topics.append(subtopics)
+        else:
+            all_topics.extend(subtopics)
+
+    topic_variants = _get_topic_variants(all_topics)
+    topic_keys = {value.casefold() for value in topic_variants}
+
+    has_query = bool(query and isinstance(query, str) and query.strip())
+
+    if not has_query and not topic_variants:
+        return []
+
+    limit = max(1, int(limit))
+    candidates = {}
+
+    # 1. Retrieve vocabulary by topic and subtopics.
+    if topic_variants:
+
+        topic_results = retrieve_vocabulary_by_topic(
+            topic_variants,
+            limit=limit * 3
+        )
+
+        for row in topic_results:
+
+            item = dict(zip(_VOCABULARY_FIELD_NAMES, row))
+
+            item["similarity"] = 0.0
+            item["topic_match"] = True
+            item["retrieval_sources"] = ["topic"]
+
+            candidates[item["id"]] = item
+
+    # 2. Retrieve semantically similar vocabulary.
+    #    A Gemini failure must not disable topic retrieval.
+    if has_query:
+
+        try:
+            semantic_results = search_semantic_vocabulary(
+                query,
+                limit=limit * 3
+            )
+
+        except Exception as error:
+            print(
+                f"[WARNING] Semantic retrieval failed; "
+                f"using topic results only: {error}"
+            )
+            semantic_results = []
+
+        for item in semantic_results:
+
+            vocabulary_id = item["id"]
+
+            if vocabulary_id in candidates:
+
+                candidates[vocabulary_id]["similarity"] = (
+                    item["similarity"]
+                )
+
+                candidates[vocabulary_id][
+                    "retrieval_sources"
+                ].append("semantic")
+
+            else:
+
+                saved_topic = item.get("topic")
+
+                normalized_saved_topic = (
+                    normalize_topic(saved_topic)
+                    if isinstance(saved_topic, str) and saved_topic.strip()
+                    else ""
+                )
+
+                item["topic_match"] = (
+                    normalized_saved_topic.casefold() in topic_keys
+                    if normalized_saved_topic
+                    else False
+                )
+                item["retrieval_sources"] = ["semantic"]
+
+                candidates[vocabulary_id] = item
+
+    # 3. Rank combined results.
+    results = list(candidates.values())
+
+    if not results:
+        return []
+
+    # Topic-only search: rank by frequency.
+    if not has_query:
+
+        results.sort(
+            key=lambda item: (
+                item["occurrence_count"],
+                item["id"]
+            ),
+            reverse=True
+        )
+
+        for item in results:
+            item["relevance_score"] = 0.0
+
+        return results[:limit]
+
+    # Calculate a small normalized occurrence bonus.
+    max_occurrences = max(
+        (item["occurrence_count"] for item in results),
+        default=1
+    )
+
+    max_occurrences = max(1, max_occurrences)
+
+    for item in results:
+
+        semantic_score = item["similarity"]
+
+        # Small bonus for matching the requested topic.
+        topic_bonus = 0.08 if item["topic_match"] else 0.0
+
+        # Frequency bonus: maximum 0.02.
+        occurrence_bonus = (
+            0.02
+            * math.log1p(item["occurrence_count"])
+            / math.log1p(max_occurrences)
+        )
+
+        item["relevance_score"] = (
+            semantic_score
+            + topic_bonus
+            + occurrence_bonus
+        )
+
+    # Sort by combined relevance.
+    results.sort(
+        key=lambda item: (
+            item["relevance_score"],
+            item["similarity"],
+            item["occurrence_count"]
+        ),
+        reverse=True
+    )
+
+    return results[:limit]
+
+
+def get_semantic_relationships(vocabulary_id):
+    """
+    Retrieve semantic relationships for a vocabulary item.
+
+    Searches in both directions because a relationship
+    is stored from the newly inserted item to an older item.
+    """
+
+    with get_connection() as connection:
+
+        rows = connection.execute("""
+            SELECT
+                vocabulary_items.id,
+                vocabulary_items.term,
+                semantic_relationships.similarity,
+                semantic_relationships.relationship_type
+
+            FROM semantic_relationships
+
+            JOIN vocabulary_items
+                ON vocabulary_items.id =
+                    CASE
+                        WHEN semantic_relationships.item_id = ?
+                        THEN semantic_relationships.related_item_id
+                        ELSE semantic_relationships.item_id
+                    END
+
+            WHERE semantic_relationships.item_id = ?
+               OR semantic_relationships.related_item_id = ?
+
+            ORDER BY semantic_relationships.similarity DESC
+        """, (
+            vocabulary_id,
+            vocabulary_id,
+            vocabulary_id,
+        )).fetchall()
+
+    return [
+        {
+            "id": row[0],
+            "term": row[1],
+            "similarity": row[2],
+            "relationship_type": row[3],
+        }
+        for row in rows
+    ]
+
+
+def update_vocabulary(
+    vocabulary_id,
+    meaning_ar=None,
+    meaning_en=None,
+    definition_en=None,
+    grammatical_class=None,
+    example=None,
+    synonyms=None,
+    topic=None,
+    source=None,
+):
+    """Update selected information for a vocabulary item."""
+
+    fields = {
+        "meaning_ar": meaning_ar,
+        "meaning_en": meaning_en,
+        "definition_en": definition_en,
+        "grammatical_class": grammatical_class,
+        "example": example,
+        "synonyms": synonyms,
+        "topic": topic,
+        "source": source,
+    }
+
+    updates = {
+        key: value
+        for key, value in fields.items()
+        if value is not None
+    }
+
+    if not updates:
+        return False
+
+    set_clause = ", ".join(
+        f"{column} = ?" for column in updates
+    )
+    set_clause += ", updated_at = CURRENT_TIMESTAMP"
+
+    values = list(updates.values())
+    values.append(vocabulary_id)
+
+    with get_connection() as connection:
+        cursor = connection.execute(
+            f"UPDATE vocabulary_items SET {set_clause} WHERE id = ?",
+            values,
+        )
+
+        return cursor.rowcount > 0
+
+
+def delete_vocabulary(vocabulary_id):
+    """
+    Delete a vocabulary item by its ID,
+    together with its semantic relationships (no orphan rows).
+    """
+
+    with get_connection() as connection:
+        connection.execute("""
+            DELETE FROM semantic_relationships
+            WHERE item_id = ? OR related_item_id = ?
+        """, (vocabulary_id, vocabulary_id))
+
+        cursor = connection.execute(
+            "DELETE FROM vocabulary_items WHERE id = ?",
+            (vocabulary_id,)
+        )
+
+        return cursor.rowcount > 0
+
+
+if __name__ == "__main__":
+    init_db()
+
+    print(f"Database initialized at: {DB_PATH}")
+
+    # Quick manual test. This used to run at import time (before the
+    # tables existed, and every time another file imported this module).
+    save_vocabulary(
+        "deal with difficulties",
+        "expression",
+        "التعامل مع الصعوبات"
+    )
+
+    print("\nSaved English mistakes:")
+    for mistake in get_mistakes():
+        print(mistake)
+
+    print("\nMistakes due for review:")
+    for mistake in get_due_mistakes():
+        print(mistake)
+
+    print("\nLearning statistics:")
+    print(get_learning_stats())
+
+    print("\nMistakes by category:")
+    for item in get_mistake_category_stats():
+        print(f"{item['category']}: {item['count']}")
+
+    print("\nRecent conversation:")
+    for message in get_chat_history():
+        print(message)
